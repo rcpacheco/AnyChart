@@ -78,6 +78,7 @@ anychart.stockModule.indicators.config = (function() {
   res[anychart.enums.StockIndicatorTypes.PPO] = anychart.stockModule.indicators.PPO;
   res[anychart.enums.StockIndicatorTypes.PRICE_CHANNELS] = anychart.stockModule.indicators.PriceChannels;
   res[anychart.enums.StockIndicatorTypes.PSAR] = anychart.stockModule.indicators.PSAR;
+  res[anychart.enums.StockIndicatorTypes.PSY] = anychart.stockModule.indicators.PSY;
   res[anychart.enums.StockIndicatorTypes.RAT] = anychart.stockModule.indicators.RAT;
   res[anychart.enums.StockIndicatorTypes.RCI] = anychart.stockModule.indicators.RCI;
   res[anychart.enums.StockIndicatorTypes.ROC] = anychart.stockModule.indicators.RoC;
