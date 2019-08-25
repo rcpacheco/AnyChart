@@ -360,7 +360,7 @@ anychart.timelineModule.Chart.prototype.todayMarker = function(opt_value) {
     this.todayMarker_.setDefaultLayout(anychart.enums.Layout.VERTICAL);
     this.todayMarker_.listenSignals(this.markerInvalidated_, this);
     var curDate = new Date();
-    this.todayMarker_['value'](Date.UTC(curDate.getUTCFullYear(), curDate.getUTCMonth(), curDate.getUTCDay()));
+    this.todayMarker_['value'](Date.UTC(curDate.getUTCFullYear(), curDate.getUTCMonth(), curDate.getUTCDate()));
     this.invalidate(anychart.ConsistencyState.AXES_CHART_AXES_MARKERS | anychart.ConsistencyState.SCALE_CHART_SCALES, anychart.Signal.NEEDS_REDRAW);
   }
 
