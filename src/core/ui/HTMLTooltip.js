@@ -89,12 +89,59 @@ goog.inherits(anychart.core.ui.HTMLTooltip, goog.Disposable);
  */
 anychart.core.ui.HTMLTooltip.prototype.treatBackgroundAsHtml = function(background, opt_padding, opt_class) {
   var props = {};
+  var styles = [];
+
   if (opt_padding) {
     //TODO (A.Kudryavtsev): Add full background config merged with css!
-    props['style'] = goog.string.subs('padding-left: %spx, padding-top: %spx, padding-right: %spx, padding-bottom: %spx',
-        opt_padding.getOption('left'), opt_padding.getOption('top'), opt_padding.getOption('right'), opt_padding.getOption('bottom'));
+    var pL = 'padding-left:' + opt_padding.getOption('left');
+    var pT = 'padding-top:' + opt_padding.getOption('top');
+    var pR = 'padding-right:' + opt_padding.getOption('right');
+    var pB = 'padding-bottom:' + opt_padding.getOption('bottom');
+
+    styles.push(pL, pT, pR, pB);
   }
 
+  
+  var fill = background.getOption('fill');
+  if (fill !== 'none') {
+    var alpha = 1;
+
+    var color = fill;
+    if (goog.isObject(fill)) {
+      color = fill.color;
+      alpha = fill.opacity;
+    }
+
+    color = goog.color.parse(color).hex;
+
+    var rgbaArray = goog.color.hexToRgb(color);
+    rgbaArray.push(alpha);
+    var rgbaString = rgbaArray.join(',');
+
+    var rgba = 'rgba(' + rgbaString + ')';
+    var bg = 'background: ' + rgba;
+    
+    styles.push(bg);
+  }
+
+  var stroke = background.getOption('stroke');
+  if (stroke !== 'none') {
+    var thickness = anychart.utils.extractThickness(stroke);
+    var color = goog.isObject(stroke) ? stroke.color : stroke;
+
+    color = goog.color.parse(color).hex;
+
+    var rgbaArray = goog.color.hexToRgb(color);
+    rgbaArray.push(alpha);
+    var rgbaString = rgbaArray.join(',');
+
+    var rgba = 'rgba(' + rgbaString + ')';
+
+    const border = 'border: ' + thickness + 'px solid ' + rgba;
+    styles.push(border);
+  }
+
+  props['style'] = styles.join(';');
   var el = goog.dom.createDom(goog.dom.TagName.DIV, props);
   if (opt_class)
     el.className = opt_class;
