@@ -1355,6 +1355,15 @@ anychart.core.Base.prototype.flattenThemes = function() {
 
 
 /**
+ * Update this.themeSettings and apply it as settings object
+ */
+anychart.core.Base.prototype.setupByThemes = function() {
+  this.flattenThemes();
+  this.setupByJSON(this.themeSettings);
+};
+
+
+/**
  * Special getter for inner usage to get any child entity, that can be get by api getters.
  * Should be used instead of using api getters for performance purpose.
  *
@@ -1782,6 +1791,7 @@ anychart.core.Base.prototype.removeAllListeners = function(opt_type) {
   proto['unlistenByKey'] = proto.unlistenByKey;//doc|ex
   proto['removeAllListeners'] = proto.removeAllListeners;//doc|ex
   proto['dispose'] = proto.dispose;
+  proto['setupByThemes'] = proto.setupByThemes;
   proto = anychart.SignalEvent.prototype;
   proto['targetNeedsRedraw'] = proto.targetNeedsRedraw;//doc
   proto['targetBoundsChanged'] = proto.targetBoundsChanged;//doc
