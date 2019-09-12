@@ -1338,14 +1338,16 @@ anychart.core.Base.prototype.createExtendedThemes = function(sourceThemes, exten
 /**
  * Creates simply merged (not recursively) json setting object
  * from instance themes chain and saves it as themeSettings
+ *
+ * @param {Array.<Object>=} opt_themesArray
  */
-anychart.core.Base.prototype.flattenThemes = function() {
+anychart.core.Base.prototype.flattenThemes = function(opt_themesArray) {
   var flatTheme = this.themeSettings || {}; // this one is to preserve themeSettings['enabled'] = true from VisualBase constructor
 
   for (var i = 0; i < this.themes_.length; i++) {
     var theme = this.themes_[i];
     if (goog.isString(theme))
-      flatTheme = anychart.getFlatTheme(theme, flatTheme, goog.bind(this.resolveSpecialValue, this));
+      flatTheme = anychart.getFlatTheme(theme, flatTheme, goog.bind(this.resolveSpecialValue, this), opt_themesArray);
     else if (goog.isObject(theme))
       goog.mixin(flatTheme, theme);
   }
@@ -1359,6 +1361,16 @@ anychart.core.Base.prototype.flattenThemes = function() {
  */
 anychart.core.Base.prototype.setupByThemes = function() {
   this.flattenThemes();
+  this.setupByJSON(this.themeSettings);
+};
+
+
+/**
+ *
+ * @param {Object} theme
+ */
+anychart.core.Base.prototype.applyTheme = function(theme) {
+  this.flattenThemes([theme]);
   this.setupByJSON(this.themeSettings);
 };
 
@@ -1791,7 +1803,10 @@ anychart.core.Base.prototype.removeAllListeners = function(opt_type) {
   proto['unlistenByKey'] = proto.unlistenByKey;//doc|ex
   proto['removeAllListeners'] = proto.removeAllListeners;//doc|ex
   proto['dispose'] = proto.dispose;
+
   proto['setupByThemes'] = proto.setupByThemes;
+  proto['applyTheme'] = proto.applyTheme;
+
   proto = anychart.SignalEvent.prototype;
   proto['targetNeedsRedraw'] = proto.targetNeedsRedraw;//doc
   proto['targetBoundsChanged'] = proto.targetBoundsChanged;//doc

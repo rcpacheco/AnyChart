@@ -675,12 +675,13 @@ anychart.appendTheme = function(value) {
  * @param {string} themePath Theme name (path) to get flattened
  * @param {Object=} opt_flatTheme Base flat theme object to collect flattened settings
  * @param {Function=} opt_resolver Function to resolve special theme values
+ * @param {Array.<Object>=} opt_themesArray
  * @return {Object} Result flattened theme object
  */
-anychart.getFlatTheme = function(themePath, opt_flatTheme, opt_resolver) {
+anychart.getFlatTheme = function(themePath, opt_flatTheme, opt_resolver, opt_themesArray) {
   opt_flatTheme = goog.isDef(opt_flatTheme) ? opt_flatTheme : {};
   var splitPath = themePath.split('.');
-  var themes = anychart.getThemes();
+  var themes = opt_themesArray || anychart.getThemes();
   var part;
 
   for (var t = 0; t < themes.length; t++) {
