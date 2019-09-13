@@ -1338,8 +1338,7 @@ anychart.core.Base.prototype.createExtendedThemes = function(sourceThemes, exten
 /**
  * Creates simply merged (not recursively) json setting object
  * from instance themes chain and saves it as themeSettings
- *
- * @param {Array.<Object>=} opt_themesArray
+ * @param {Array.<Object>=} opt_themesArray Array of themes objects. If not provided anychart global themes would be used.
  */
 anychart.core.Base.prototype.flattenThemes = function(opt_themesArray) {
   var flatTheme = this.themeSettings || {}; // this one is to preserve themeSettings['enabled'] = true from VisualBase constructor
@@ -1357,17 +1356,8 @@ anychart.core.Base.prototype.flattenThemes = function(opt_themesArray) {
 
 
 /**
- * Update this.themeSettings and apply it as settings object
- */
-anychart.core.Base.prototype.setupByThemes = function() {
-  this.flattenThemes();
-  this.setupByJSON(this.themeSettings);
-};
-
-
-/**
- *
- * @param {Object} theme
+ * Append new theme object to themeSettings using and apply themeSettings as settings object.
+ * @param {Object} theme Theme object.
  */
 anychart.core.Base.prototype.applyTheme = function(theme) {
   this.flattenThemes([theme]);
@@ -1803,8 +1793,6 @@ anychart.core.Base.prototype.removeAllListeners = function(opt_type) {
   proto['unlistenByKey'] = proto.unlistenByKey;//doc|ex
   proto['removeAllListeners'] = proto.removeAllListeners;//doc|ex
   proto['dispose'] = proto.dispose;
-
-  proto['setupByThemes'] = proto.setupByThemes;
   proto['applyTheme'] = proto.applyTheme;
 
   proto = anychart.SignalEvent.prototype;

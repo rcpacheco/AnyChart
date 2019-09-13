@@ -675,7 +675,7 @@ anychart.appendTheme = function(value) {
  * @param {string} themePath Theme name (path) to get flattened
  * @param {Object=} opt_flatTheme Base flat theme object to collect flattened settings
  * @param {Function=} opt_resolver Function to resolve special theme values
- * @param {Array.<Object>=} opt_themesArray
+ * @param {Array.<Object>=} opt_themesArray Array of themes objects. If not provided anychart global themes would be used.
  * @return {Object} Result flattened theme object
  */
 anychart.getFlatTheme = function(themePath, opt_flatTheme, opt_resolver, opt_themesArray) {
