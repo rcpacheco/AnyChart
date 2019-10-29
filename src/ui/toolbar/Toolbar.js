@@ -32,6 +32,17 @@ anychart.ui.toolbar.Toolbar = function() {
    * @type {anychart.core.Chart}
    */
   this.targetChart_;
+
+  /**
+   * Toolbar items.
+   * @type {Array.<Object>}
+   */
+  this.items_;
+
+  /**
+   * @type {Array.<goog.ui.Component>}
+   */
+  this.itemsComponents_;
 };
 goog.inherits(anychart.ui.toolbar.Toolbar, goog.ui.Toolbar);
 
@@ -92,3 +103,19 @@ anychart.ui.toolbar.Toolbar.prototype.draw = function() {
   }
   return this;
 };
+
+
+/**
+ * Creates and returns new simple toolbar.
+ * @return {anychart.ui.toolbar.Toolbar}
+ */
+anychart.ui.simpleToolbar = function() {
+  return new anychart.ui.toolbar.Toolbar();
+};
+
+(function() {
+  goog.exportSymbol('anychart.ui.simpleToolbar', anychart.ui.simpleToolbar);
+  var proto = anychart.ui.toolbar.Toolbar.prototype;
+  proto['draw'] = proto.draw;
+  proto['target'] = proto.target;
+})();

@@ -12,3 +12,4 @@ goog.require('anychart.ui.Preloader');
 goog.require('anychart.ui.RangePicker');
 goog.require('anychart.ui.RangeSelector');
 goog.require('anychart.ui.Zoom');
+goog.require('anychart.ui.toolbar.Toolbar');
