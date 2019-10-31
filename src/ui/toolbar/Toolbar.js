@@ -105,6 +105,31 @@ anychart.ui.toolbar.Toolbar.prototype.draw = function() {
 };
 
 
+anychart.ui.toolbar.Toolbar.prototype.items = function(items) {
+
+};
+
+
+anychart.ui.toolbar.Toolbar.prototype.show = function() {
+
+};
+
+
+anychart.ui.toolbar.Toolbar.prototype.hide = function() {
+
+};
+
+
+anychart.ui.toolbar.Toolbar.prototype.addClassName = function() {
+
+};
+
+
+anychart.ui.toolbar.Toolbar.prototype.removeClassName = function() {
+
+};
+
+
 /**
  * Creates and returns new simple toolbar.
  * @return {anychart.ui.toolbar.Toolbar}
