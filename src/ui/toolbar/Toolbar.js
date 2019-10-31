@@ -105,6 +105,23 @@ anychart.ui.toolbar.Toolbar.prototype.draw = function() {
 };
 
 
+/**
+ * @typedef {{
+ *  text: string,
+ *  index: number,
+ *  action: function,
+ *  iconClass: string,
+ *  subMenu: Object.<string, anychart.ui.toolbar.Toolbar.Item>,
+ *  classNames: (string|Array.<string>)
+ * }}
+ */
+anychart.ui.toolbar.Toolbar.Item;
+
+
+/**
+ *
+ * @param items
+ */
 anychart.ui.toolbar.Toolbar.prototype.items = function(items) {
 
 };
