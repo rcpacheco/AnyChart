@@ -123,27 +123,31 @@ anychart.ui.toolbar.Toolbar.Item;
  * @param items
  */
 anychart.ui.toolbar.Toolbar.prototype.items = function(items) {
-
+  if (goog.isDef(items)) {
+    this.items_ = items;
+    return this;
+  }
+  return this.items_;
 };
 
 
 anychart.ui.toolbar.Toolbar.prototype.show = function() {
-
+  this.getElement()['style']['display'] = '';
 };
 
 
 anychart.ui.toolbar.Toolbar.prototype.hide = function() {
-
+  this.getElement()['style']['display'] = 'none';
 };
 
 
-anychart.ui.toolbar.Toolbar.prototype.addClassName = function() {
-
+anychart.ui.toolbar.Toolbar.prototype.addClassName = function(className) {
+  this.addClassName(className);
 };
 
 
-anychart.ui.toolbar.Toolbar.prototype.removeClassName = function() {
-
+anychart.ui.toolbar.Toolbar.prototype.removeClassName = function(className) {
+  this.removeClassName(className);
 };
 
 
