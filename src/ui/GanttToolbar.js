@@ -17,7 +17,7 @@ goog.require('goog.ui.ToolbarButton');
 
 /**
  * @constructor
- * @extends {anychart.ui.toolbarItems.Toolbar}
+ * @extends {anychart.ui.Toolbar}
  */
 anychart.ui.GanttToolbar = function() {
   anychart.ui.GanttToolbar.base(this, 'constructor');
@@ -531,10 +531,6 @@ anychart.ui.GanttToolbar.prototype.updateLocalizedCaptions = function() {
   return this;
 };
 
-anychart.ui.GanttToolbar.prototype.hide = function() {
-  this.getElement().style.display = 'none';
-};
-
 
 /**
  * Constructor function for gantt toolbar.
@@ -556,5 +552,4 @@ anychart.ui.ganttToolbar = function() {
   proto['buttonsMode'] = proto.buttonsMode;
   proto['printFunction'] = proto.printFunction;
   proto['updateLocalizedCaptions'] = proto.updateLocalizedCaptions;
-  proto['hide'] = proto.hide;
 })();

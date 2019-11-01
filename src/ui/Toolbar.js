@@ -1,15 +1,11 @@
 goog.provide('anychart.ui.Toolbar');
 
 goog.require('anychart.core.reporting');
+goog.require('anychart.ui.toolbarItems.Separator');
 goog.require('goog.ui.Toolbar');
+goog.require('goog.ui.ToolbarButton');
 
 goog.forwardDeclare('anychart.core.Chart');
-
-/**
- * Namespace anychart.ui
- * @namespace
- * @name anychart.ui
- */
 
 
 
@@ -109,9 +105,18 @@ anychart.ui.Toolbar.prototype.draw = function() {
 
 /**
  * @typedef {{
+ *  item: anychart.ui.Toolbar.Item,
+ *  chart: (anychart.core.Chart|undefined)
+ * }}
+ */
+anychart.ui.Toolbar.ActionContext;
+
+
+/**
+ * @typedef {{
  *  text: string,
  *  index: number,
- *  action: function,
+ *  action: function(this: anychart.ui.Toolbar.ActionContext, anychart.ui.Toolbar.ActionContext),
  *  iconClass: string,
  *  subMenu: Object.<string, anychart.ui.Toolbar.Item>,
  *  classNames: (string|Array.<string>)
@@ -143,7 +148,7 @@ anychart.ui.Toolbar.prototype.handleAction_ = function(e) {
   var item = e['target'];
   var itemModel = item.getModel();
   var actionContext = {
-    'target': this.targetChart_,
+    'chart': this.targetChart_,
     'item': itemModel
   };
 

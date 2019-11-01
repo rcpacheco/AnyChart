@@ -646,7 +646,7 @@ goog.addDependency('../../../../src/ui/GanttToolbar.js', ['anychart.ui.GanttTool
 goog.addDependency('../../../../src/ui/Preloader.js', ['anychart.ui.Preloader'], ['goog.ui.Component'], {});
 goog.addDependency('../../../../src/ui/RangePicker.js', ['anychart.ui.RangePicker'], ['anychart.enums', 'goog.dom.selection', 'goog.events.KeyHandler', 'goog.ui.Component', 'goog.ui.LabelInput'], {});
 goog.addDependency('../../../../src/ui/RangeSelector.js', ['anychart.ui.RangeSelector', 'anychart.ui.RangeSelector.Range'], ['anychart.enums', 'anychart.ui.button.Toggle', 'goog.ui.ButtonSide', 'goog.ui.Component', 'goog.ui.Component.EventType', 'goog.ui.SelectionModel'], {});
-goog.addDependency('../../../../src/ui/Toolbar.js', ['anychart.ui.Toolbar'], ['anychart.core.reporting', 'goog.ui.Toolbar'], {});
+goog.addDependency('../../../../src/ui/Toolbar.js', ['anychart.ui.Toolbar'], ['anychart.core.reporting', 'anychart.ui.toolbarItems.Separator', 'goog.ui.Toolbar', 'goog.ui.ToolbarButton'], {});
 goog.addDependency('../../../../src/ui/Zoom.js', ['anychart.ui.Zoom'], ['anychart.enums', 'anychart.ui.button.Base', 'goog.ui.Component', 'goog.ui.Component.EventType'], {});
 goog.addDependency('../../../../src/ui/button/Base.js', ['anychart.ui.button.Base'], ['goog.ui.Button'], {});
 goog.addDependency('../../../../src/ui/button/Primary.js', ['anychart.ui.button.Primary'], ['anychart.ui.button.Base'], {});
