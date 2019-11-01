@@ -43,6 +43,8 @@ anychart.ui.toolbar.Toolbar = function() {
    * @type {Array.<goog.ui.Component>}
    */
   this.itemsComponents_;
+
+  this.listen(goog.ui.Component.EventType.ACTION, this.handleAction_);
 };
 goog.inherits(anychart.ui.toolbar.Toolbar, goog.ui.Toolbar);
 
@@ -119,15 +121,84 @@ anychart.ui.toolbar.Toolbar.Item;
 
 
 /**
- *
- * @param items
+ * Context menu item comparison function.
+ * @param {anychart.ui.toolbar.Toolbar.Item} item1 - .
+ * @param {anychart.ui.toolbar.Toolbar.Item} item2 - .
+ * @return {number}
+ * @private
  */
-anychart.ui.toolbar.Toolbar.prototype.items = function(items) {
-  if (goog.isDef(items)) {
-    this.items_ = items;
+anychart.ui.toolbar.Toolbar.prototype.itemSort_ = function(item1, item2) {
+  if (!goog.isNumber(item1['index'])) return 1;
+  if (!goog.isNumber(item2['index'])) return -1;
+  return item1['index'] - item2['index'] || 1; //Avoid item replacement.
+};
+
+
+anychart.ui.toolbar.Toolbar.prototype.handleAction_ = function(e) {
+  var item = e['target'];
+  var itemModel = item.getModel();
+  var actionContext = {
+    'target': this.targetChart_,
+    'item': itemModel
+  };
+
+  if (goog.isFunction(itemModel['action'])) {
+    itemModel['action'].call(actionContext, actionContext);
+  }
+};
+
+;
+
+
+/**
+ *
+ * @param menu
+ * @param model
+ * @private
+ */
+anychart.ui.toolbar.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) {
+  var sortedModel = [];
+
+  for (var key in model) {
+    var modelItem = model[key];
+    if (model.hasOwnProperty(key)) {
+      goog.array.binaryInsert(sortedModel, modelItem, this.itemSort_);
+    }
+  }
+
+  for (var i = 0; i < sortedModel.length; i++) {
+    var itemData = sortedModel[i];
+
+    if (!itemData['text']) {
+      // Separator.
+      this.addChild(new anychart.ui.toolbar.Separator(), true);
+    } else if (itemData['subMenu']) {
+      // Sub menu. Might be anychart.ui.menu.Menu or anychart.ui.menu.SubMenu.
+
+    } else {
+      // Menu item, or button.
+      var button = new goog.ui.ToolbarButton(itemData['text']);
+      button.setModel(itemData);
+      this.addChild(button, true);
+    }
+  }
+
+};
+
+
+/**
+ *
+ * @param {Object.<string, anychart.ui.toolbar.Toolbar.Item>=} opt_value
+ * @return {Object.<string, anychart.ui.toolbar.Toolbar.Item>}
+ */
+anychart.ui.toolbar.Toolbar.prototype.items = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    this.setModel(opt_value);
+    this.removeChildren(true);
+    this.makeToolbarMenus_(this, opt_value);
     return this;
   }
-  return this.items_;
+  return this.getModel();
 };
 
 
