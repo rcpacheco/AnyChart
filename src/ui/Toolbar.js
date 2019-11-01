@@ -134,6 +134,11 @@ anychart.ui.Toolbar.prototype.itemSort_ = function(item1, item2) {
 };
 
 
+/**
+ * Toolbar action handler.
+ * @param {goog.events.Event} e
+ * @private
+ */
 anychart.ui.Toolbar.prototype.handleAction_ = function(e) {
   var item = e['target'];
   var itemModel = item.getModel();
@@ -149,9 +154,9 @@ anychart.ui.Toolbar.prototype.handleAction_ = function(e) {
 
 
 /**
- *
- * @param menu
- * @param model
+ * Recursively creates toolbar buttons, menus and submenus.
+ * @param {anychart.ui.Toolbar|anychart.ui.toolbarItems.MenuButton|anychart.ui.menu.Menu} menu
+ * @param {Object.<string, anychart.ui.Toolbar.Item>} model
  * @private
  */
 anychart.ui.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) {
@@ -196,25 +201,39 @@ anychart.ui.Toolbar.prototype.items = function(opt_value) {
     this.makeToolbarMenus_(this, opt_value);
     return this;
   }
-  return this.getModel();
+  return /** @type {Object.<string, anychart.ui.Toolbar.Item>}*/(this.getModel());
 };
 
 
+/**
+ * Show toolbar.
+ */
 anychart.ui.Toolbar.prototype.show = function() {
   this.getElement()['style']['display'] = '';
 };
 
 
+/**
+ * Hide toolbar.
+ */
 anychart.ui.Toolbar.prototype.hide = function() {
   this.getElement()['style']['display'] = 'none';
 };
 
 
+/**
+ * Add class name to toolbar element.
+ * @param {string} className
+ */
 anychart.ui.Toolbar.prototype.addClassName = function(className) {
   this.addClassName(className);
 };
 
 
+/**
+ * Remove class name from toolbar element.
+ * @param {string} className
+ */
 anychart.ui.Toolbar.prototype.removeClassName = function(className) {
   this.removeClassName(className);
 };
@@ -233,4 +252,7 @@ anychart.ui.toolbar = function() {
   var proto = anychart.ui.Toolbar.prototype;
   proto['draw'] = proto.draw;
   proto['target'] = proto.target;
+  proto['items'] = proto.items;
+  proto['show'] = proto.show;
+  proto['hide'] = proto.hide;
 })();
