@@ -1,4 +1,4 @@
-goog.provide('anychart.ui.toolbar.SeparatorRenderer');
+goog.provide('anychart.ui.toolbarItems.SeparatorRenderer');
 
 goog.require('goog.ui.ToolbarSeparatorRenderer');
 
@@ -9,11 +9,11 @@ goog.require('goog.ui.ToolbarSeparatorRenderer');
  * @constructor
  * @extends {goog.ui.ToolbarSeparatorRenderer}
  */
-anychart.ui.toolbar.SeparatorRenderer = function() {
-  anychart.ui.toolbar.SeparatorRenderer.base(this, 'constructor');
+anychart.ui.toolbarItems.SeparatorRenderer = function() {
+  anychart.ui.toolbarItems.SeparatorRenderer.base(this, 'constructor');
 };
-goog.inherits(anychart.ui.toolbar.SeparatorRenderer, goog.ui.ToolbarSeparatorRenderer);
-goog.addSingletonGetter(anychart.ui.toolbar.SeparatorRenderer);
+goog.inherits(anychart.ui.toolbarItems.SeparatorRenderer, goog.ui.ToolbarSeparatorRenderer);
+goog.addSingletonGetter(anychart.ui.toolbarItems.SeparatorRenderer);
 
 
 /**
@@ -24,7 +24,7 @@ goog.addSingletonGetter(anychart.ui.toolbar.SeparatorRenderer);
  * @return {!Element} - Root element for the separator.
  * @override
  */
-anychart.ui.toolbar.SeparatorRenderer.prototype.createDom = function(separator) {
+anychart.ui.toolbarItems.SeparatorRenderer.prototype.createDom = function(separator) {
   var element = separator.getDomHelper().createDom(goog.dom.TagName.DIV,
       this.getClassNames(separator).join(' ') +
           ' ' + goog.ui.INLINE_BLOCK_CLASSNAME);

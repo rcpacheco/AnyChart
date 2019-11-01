@@ -1,4 +1,4 @@
-goog.provide('anychart.ui.toolbar.MenuButtonRenderer');
+goog.provide('anychart.ui.toolbarItems.MenuButtonRenderer');
 
 goog.require('goog.ui.ToolbarMenuButtonRenderer');
 
@@ -9,11 +9,11 @@ goog.require('goog.ui.ToolbarMenuButtonRenderer');
  * @constructor
  * @extends {goog.ui.ToolbarMenuButtonRenderer}
  */
-anychart.ui.toolbar.MenuButtonRenderer = function() {
-  anychart.ui.toolbar.MenuButtonRenderer.base(this, 'constructor');
+anychart.ui.toolbarItems.MenuButtonRenderer = function() {
+  anychart.ui.toolbarItems.MenuButtonRenderer.base(this, 'constructor');
 };
-goog.inherits(anychart.ui.toolbar.MenuButtonRenderer, goog.ui.ToolbarMenuButtonRenderer);
-goog.addSingletonGetter(anychart.ui.toolbar.MenuButtonRenderer);
+goog.inherits(anychart.ui.toolbarItems.MenuButtonRenderer, goog.ui.ToolbarMenuButtonRenderer);
+goog.addSingletonGetter(anychart.ui.toolbarItems.MenuButtonRenderer);
 
 
 /**
@@ -25,7 +25,7 @@ goog.addSingletonGetter(anychart.ui.toolbar.MenuButtonRenderer);
  * @param {goog.dom.DomHelper} dom - DOM helper, used for document interaction.
  * @return {Element} - Dropdown element.
  */
-anychart.ui.toolbar.MenuButtonRenderer.prototype.createDropdown = function(dom) {
+anychart.ui.toolbarItems.MenuButtonRenderer.prototype.createDropdown = function(dom) {
   var element = dom.createDom(goog.dom.TagName.DIV,
       goog.ui.INLINE_BLOCK_CLASSNAME + ' ' +
       goog.getCssName(this.getCssClass(), 'dropdown'));

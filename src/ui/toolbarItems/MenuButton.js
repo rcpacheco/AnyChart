@@ -1,6 +1,6 @@
-goog.provide('anychart.ui.toolbar.MenuButton');
+goog.provide('anychart.ui.toolbarItems.MenuButton');
 
-goog.require('anychart.ui.toolbar.MenuButtonRenderer');
+goog.require('anychart.ui.toolbarItems.MenuButtonRenderer');
 goog.require('goog.ui.ToolbarMenuButton');
 
 
@@ -13,21 +13,21 @@ goog.require('goog.ui.ToolbarMenuButton');
  * @param {anychart.ui.menu.Menu=} opt_menu Menu to render under the button when clicked.
  * @param {goog.ui.ButtonRenderer=} opt_renderer Optional renderer used to
  *     render or decorate the button; defaults to
- *     {@link anychart.ui.toolbar.MenuButtonRenderer}.
+ *     {@link anychart.ui.toolbarItems.MenuButtonRenderer}.
  * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper, used for
  *     document interaction.
  * @constructor
  * @extends {goog.ui.ToolbarMenuButton}
  */
-anychart.ui.toolbar.MenuButton = function(content, opt_menu, opt_renderer, opt_domHelper) {
-  anychart.ui.toolbar.MenuButton.base(this, 'constructor', content, opt_menu, opt_renderer ||
-      anychart.ui.toolbar.MenuButtonRenderer.getInstance(), opt_domHelper);
+anychart.ui.toolbarItems.MenuButton = function(content, opt_menu, opt_renderer, opt_domHelper) {
+  anychart.ui.toolbarItems.MenuButton.base(this, 'constructor', content, opt_menu, opt_renderer ||
+      anychart.ui.toolbarItems.MenuButtonRenderer.getInstance(), opt_domHelper);
 };
-goog.inherits(anychart.ui.toolbar.MenuButton, goog.ui.ToolbarMenuButton);
+goog.inherits(anychart.ui.toolbarItems.MenuButton, goog.ui.ToolbarMenuButton);
 
 
 /** @override */
-anychart.ui.toolbar.MenuButton.prototype.handleKeyEventInternal = function(e) {
+anychart.ui.toolbarItems.MenuButton.prototype.handleKeyEventInternal = function(e) {
   // Handle SPACE on keyup and all other keys on keypress.
   if (e.keyCode == goog.events.KeyCodes.SPACE) {
     // Prevent page scrolling in Chrome.

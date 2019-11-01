@@ -1,4 +1,4 @@
-goog.provide('anychart.ui.toolbar.Toolbar');
+goog.provide('anychart.ui.Toolbar');
 
 goog.require('anychart.core.reporting');
 goog.require('goog.ui.Toolbar');
@@ -6,9 +6,9 @@ goog.require('goog.ui.Toolbar');
 goog.forwardDeclare('anychart.core.Chart');
 
 /**
- * Namespace anychart.ui.toolbar
+ * Namespace anychart.ui
  * @namespace
- * @name anychart.ui.toolbar
+ * @name anychart.ui
  */
 
 
@@ -18,8 +18,8 @@ goog.forwardDeclare('anychart.core.Chart');
  * @constructor
  * @extends {goog.ui.Toolbar}
  */
-anychart.ui.toolbar.Toolbar = function() {
-  anychart.ui.toolbar.Toolbar.base(this, 'constructor');
+anychart.ui.Toolbar = function() {
+  anychart.ui.Toolbar.base(this, 'constructor');
 
   /**
    * Container.
@@ -46,22 +46,22 @@ anychart.ui.toolbar.Toolbar = function() {
 
   this.listen(goog.ui.Component.EventType.ACTION, this.handleAction_);
 };
-goog.inherits(anychart.ui.toolbar.Toolbar, goog.ui.Toolbar);
+goog.inherits(anychart.ui.Toolbar, goog.ui.Toolbar);
 
 
 /**
  * Type declaration for text caption or DOM structure to be used as the content.
  * @typedef {string|Node|Array<Node>|NodeList}
  */
-anychart.ui.toolbar.Toolbar.ControlContent;
+anychart.ui.Toolbar.ControlContent;
 
 
 /**
  * Gets/sets toolbar container.
  * @param {(string|Element)=} opt_element - Element ID or a DOM node.
- * @return {anychart.ui.toolbar.Toolbar|Element|undefined} - Current container or itself for method chaining.
+ * @return {anychart.ui.Toolbar|Element|undefined} - Current container or itself for method chaining.
  */
-anychart.ui.toolbar.Toolbar.prototype.container = function(opt_element) {
+anychart.ui.Toolbar.prototype.container = function(opt_element) {
   if (goog.isDef(opt_element)) {
     var newContainer = goog.dom.getElement(opt_element);
     if (this.container_ != newContainer) {
@@ -78,9 +78,9 @@ anychart.ui.toolbar.Toolbar.prototype.container = function(opt_element) {
 /**
  * Gets/sets controlled chart.
  * @param {anychart.core.Chart=} opt_value - Target chart.
- * @return {anychart.ui.toolbar.Toolbar|anychart.core.Chart|undefined} - Current target or itself for method chaining.
+ * @return {anychart.ui.Toolbar|anychart.core.Chart|undefined} - Current target or itself for method chaining.
  */
-anychart.ui.toolbar.Toolbar.prototype.target = function(opt_value) {
+anychart.ui.Toolbar.prototype.target = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.targetChart_ = opt_value;
     return this;
@@ -91,9 +91,9 @@ anychart.ui.toolbar.Toolbar.prototype.target = function(opt_value) {
 
 /**
  * Draws toolbar.
- * @return {anychart.ui.toolbar.Toolbar} - Itself for method chaining.
+ * @return {anychart.ui.Toolbar} - Itself for method chaining.
  */
-anychart.ui.toolbar.Toolbar.prototype.draw = function() {
+anychart.ui.Toolbar.prototype.draw = function() {
   if (this.container_) {
     if (this.container_.firstChild) {
       this.renderBefore(this.container_.firstChild);
@@ -113,28 +113,28 @@ anychart.ui.toolbar.Toolbar.prototype.draw = function() {
  *  index: number,
  *  action: function,
  *  iconClass: string,
- *  subMenu: Object.<string, anychart.ui.toolbar.Toolbar.Item>,
+ *  subMenu: Object.<string, anychart.ui.Toolbar.Item>,
  *  classNames: (string|Array.<string>)
  * }}
  */
-anychart.ui.toolbar.Toolbar.Item;
+anychart.ui.Toolbar.Item;
 
 
 /**
  * Context menu item comparison function.
- * @param {anychart.ui.toolbar.Toolbar.Item} item1 - .
- * @param {anychart.ui.toolbar.Toolbar.Item} item2 - .
+ * @param {anychart.ui.Toolbar.Item} item1 - .
+ * @param {anychart.ui.Toolbar.Item} item2 - .
  * @return {number}
  * @private
  */
-anychart.ui.toolbar.Toolbar.prototype.itemSort_ = function(item1, item2) {
+anychart.ui.Toolbar.prototype.itemSort_ = function(item1, item2) {
   if (!goog.isNumber(item1['index'])) return 1;
   if (!goog.isNumber(item2['index'])) return -1;
   return item1['index'] - item2['index'] || 1; //Avoid item replacement.
 };
 
 
-anychart.ui.toolbar.Toolbar.prototype.handleAction_ = function(e) {
+anychart.ui.Toolbar.prototype.handleAction_ = function(e) {
   var item = e['target'];
   var itemModel = item.getModel();
   var actionContext = {
@@ -147,8 +147,6 @@ anychart.ui.toolbar.Toolbar.prototype.handleAction_ = function(e) {
   }
 };
 
-;
-
 
 /**
  *
@@ -156,7 +154,7 @@ anychart.ui.toolbar.Toolbar.prototype.handleAction_ = function(e) {
  * @param model
  * @private
  */
-anychart.ui.toolbar.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) {
+anychart.ui.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) {
   var sortedModel = [];
 
   for (var key in model) {
@@ -171,7 +169,7 @@ anychart.ui.toolbar.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) 
 
     if (!itemData['text']) {
       // Separator.
-      this.addChild(new anychart.ui.toolbar.Separator(), true);
+      this.addChild(new anychart.ui.toolbarItems.Separator(), true);
     } else if (itemData['subMenu']) {
       // Sub menu. Might be anychart.ui.menu.Menu or anychart.ui.menu.SubMenu.
 
@@ -188,10 +186,10 @@ anychart.ui.toolbar.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) 
 
 /**
  *
- * @param {Object.<string, anychart.ui.toolbar.Toolbar.Item>=} opt_value
- * @return {Object.<string, anychart.ui.toolbar.Toolbar.Item>}
+ * @param {Object.<string, anychart.ui.Toolbar.Item>=} opt_value
+ * @return {Object.<string, anychart.ui.Toolbar.Item>}
  */
-anychart.ui.toolbar.Toolbar.prototype.items = function(opt_value) {
+anychart.ui.Toolbar.prototype.items = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.setModel(opt_value);
     this.removeChildren(true);
@@ -202,37 +200,37 @@ anychart.ui.toolbar.Toolbar.prototype.items = function(opt_value) {
 };
 
 
-anychart.ui.toolbar.Toolbar.prototype.show = function() {
+anychart.ui.Toolbar.prototype.show = function() {
   this.getElement()['style']['display'] = '';
 };
 
 
-anychart.ui.toolbar.Toolbar.prototype.hide = function() {
+anychart.ui.Toolbar.prototype.hide = function() {
   this.getElement()['style']['display'] = 'none';
 };
 
 
-anychart.ui.toolbar.Toolbar.prototype.addClassName = function(className) {
+anychart.ui.Toolbar.prototype.addClassName = function(className) {
   this.addClassName(className);
 };
 
 
-anychart.ui.toolbar.Toolbar.prototype.removeClassName = function(className) {
+anychart.ui.Toolbar.prototype.removeClassName = function(className) {
   this.removeClassName(className);
 };
 
 
 /**
  * Creates and returns new simple toolbar.
- * @return {anychart.ui.toolbar.Toolbar}
+ * @return {anychart.ui.Toolbar}
  */
-anychart.ui.simpleToolbar = function() {
-  return new anychart.ui.toolbar.Toolbar();
+anychart.ui.toolbar = function() {
+  return new anychart.ui.Toolbar();
 };
 
 (function() {
-  goog.exportSymbol('anychart.ui.simpleToolbar', anychart.ui.simpleToolbar);
-  var proto = anychart.ui.toolbar.Toolbar.prototype;
+  goog.exportSymbol('anychart.ui.toolbar', anychart.ui.toolbar);
+  var proto = anychart.ui.Toolbar.prototype;
   proto['draw'] = proto.draw;
   proto['target'] = proto.target;
 })();

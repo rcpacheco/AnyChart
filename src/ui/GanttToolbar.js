@@ -2,13 +2,13 @@ goog.provide('anychart.ui.GanttToolbar');
 
 goog.require('anychart.core.reporting');
 goog.require('anychart.enums');
+goog.require('anychart.ui.Toolbar');
 goog.require('anychart.ui.menu.Item');
 goog.require('anychart.ui.menu.Menu');
 goog.require('anychart.ui.menu.SubMenu');
 goog.require('anychart.ui.menu.ToolbarMenuRenderer');
-goog.require('anychart.ui.toolbar.MenuButton');
-goog.require('anychart.ui.toolbar.Separator');
-goog.require('anychart.ui.toolbar.Toolbar');
+goog.require('anychart.ui.toolbarItems.MenuButton');
+goog.require('anychart.ui.toolbarItems.Separator');
 
 goog.require('goog.ui.MenuSeparator');
 goog.require('goog.ui.ToolbarButton');
@@ -17,7 +17,7 @@ goog.require('goog.ui.ToolbarButton');
 
 /**
  * @constructor
- * @extends {anychart.ui.toolbar.Toolbar}
+ * @extends {anychart.ui.toolbarItems.Toolbar}
  */
 anychart.ui.GanttToolbar = function() {
   anychart.ui.GanttToolbar.base(this, 'constructor');
@@ -54,7 +54,7 @@ anychart.ui.GanttToolbar = function() {
 
   this.listen(goog.ui.Component.EventType.ACTION, this.handleAction_);
 };
-goog.inherits(anychart.ui.GanttToolbar, anychart.ui.toolbar.Toolbar);
+goog.inherits(anychart.ui.GanttToolbar, anychart.ui.Toolbar);
 
 
 /**
@@ -129,7 +129,7 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
   this.printMenu_.addChild(new goog.ui.MenuSeparator(), true);
 
   var printMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.PRINT);
-  this.printButton_ = new anychart.ui.toolbar.MenuButton(printMessage, this.printMenu_);
+  this.printButton_ = new anychart.ui.toolbarItems.MenuButton(printMessage, this.printMenu_);
   this.printButton_.addClassName(anychart.ui.GanttToolbar.CssClass.PRINT);
   this.printButton_.setModel({
     id: anychart.ui.GanttToolbar.ButtonIds.PRINT,
@@ -140,7 +140,7 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
   this.buttonsWithIcons_.push(this.printButton_);
 
   // --------- SAVE AS ----------
-  this.addChild(new anychart.ui.toolbar.Separator(), true);
+  this.addChild(new anychart.ui.toolbarItems.Separator(), true);
 
   /**
    * Save as menu.
@@ -186,7 +186,7 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
   this.subButtonsWithIcons_.push(pdfSubMenu);
 
   var saveAsMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.SAVE_AS);
-  var saveAsButton = new anychart.ui.toolbar.MenuButton(saveAsMessage, this.saveAsMenu_);
+  var saveAsButton = new anychart.ui.toolbarItems.MenuButton(saveAsMessage, this.saveAsMenu_);
   saveAsButton.addClassName(anychart.ui.GanttToolbar.CssClass.SAVE_AS);
   saveAsButton.setModel({
     id: anychart.ui.GanttToolbar.ButtonIds.SAVE_AS,
@@ -197,7 +197,7 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
   this.buttonsWithIcons_.push(saveAsButton);
 
   // --------- ZOOM IN, ZOOM OUT, FIT ALL ----------
-  this.addChild(new anychart.ui.toolbar.Separator(), true);
+  this.addChild(new anychart.ui.toolbarItems.Separator(), true);
 
   var zoomInMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.ZOOM_IN);
   var zoomInButton = new goog.ui.ToolbarButton(zoomInMessage);
@@ -237,7 +237,7 @@ anychart.ui.GanttToolbar.prototype.createButtonsAndMenus = function() {
   this.buttonsWithIcons_.push(fitAllButton);
 
   // --------- EXPAND/COLLAPSE ----------
-  this.addChild(new anychart.ui.toolbar.Separator(), true);
+  this.addChild(new anychart.ui.toolbarItems.Separator(), true);
 
   var expandMessage = this.getLocalizedCaption(anychart.ui.GanttToolbar.ButtonIds.EXPAND_ALL);
   var expandAllButton = new goog.ui.ToolbarButton(expandMessage);
@@ -320,7 +320,7 @@ anychart.ui.GanttToolbar.prototype.buttonsMode = function(opt_mode) {
 
 /**
  *
- * @param {anychart.ui.toolbar.MenuButton|goog.ui.ToolbarButton|anychart.ui.menu.Item|anychart.ui.menu.SubMenu} item
+ * @param {anychart.ui.toolbarItems.MenuButton|goog.ui.ToolbarButton|anychart.ui.menu.Item|anychart.ui.menu.SubMenu} item
  * @param {boolean|string=} opt_icon
  * @param {boolean|string=} opt_text
  * @private
@@ -330,7 +330,7 @@ anychart.ui.GanttToolbar.prototype.setIconTo_ = function(item, opt_icon, opt_tex
   var model = item.getModel();
   var icon = model.icon;
   var text = model.text;
-  var topLevelItem = anychart.utils.instanceOf(item, anychart.ui.toolbar.MenuButton) || anychart.utils.instanceOf(item, goog.ui.ToolbarButton);
+  var topLevelItem = anychart.utils.instanceOf(item, anychart.ui.toolbarItems.MenuButton) || anychart.utils.instanceOf(item, goog.ui.ToolbarButton);
 
   if (element) {
     var iconElement = goog.dom.getElementsByTagNameAndClass(goog.dom.TagName.I, 'anychart-toolbar-item-icon', element)[0];
