@@ -42,9 +42,9 @@ anychart.ui.Toolbar = function() {
 
   /**
    * Items with icons, succeptible to buttons mode change.
-   * @type {anychart.ui.toolbarItems.MenuButton|goog.ui.ToolbarButton|anychart.ui.menu.Item|anychart.ui.menu.SubMenu>}
+   * @type {Array.<anychart.ui.toolbarItems.MenuButton|goog.ui.ToolbarButton|anychart.ui.menu.Item|anychart.ui.menu.SubMenu>}
    */
-  this.itemsWithIcons = [];
+  this.itemsWithIcons_ = [];
 
   this.listen(goog.ui.Component.EventType.ACTION, this.handleAction_);
 };
@@ -189,9 +189,10 @@ anychart.ui.Toolbar.prototype.setIconTo_ = function(item, opt_icon, opt_index) {
     if (opt_icon) {
       if (iconElement) {
         goog.dom.classlist.set(iconElement, opt_icon);
+        goog.dom.classlist.add(iconElement, 'anychart-toolbar-item-icon');
         goog.style.setElementShown(iconElement, true);
       } else {
-        iconElement = goog.dom.createDom(goog.dom.TagName.I, opt_icon);
+        iconElement = goog.dom.createDom(goog.dom.TagName.I, ['anychart-toolbar-item-icon', opt_icon]);
         goog.a11y.aria.setState(iconElement, goog.a11y.aria.State.HIDDEN, true);
         goog.dom.insertChildAt(element, iconElement, opt_index || 0);
       }
@@ -203,12 +204,12 @@ anychart.ui.Toolbar.prototype.setIconTo_ = function(item, opt_icon, opt_index) {
 
 
 /**
- * Recursively creates toolbar buttons, menus and submenus.
+ * Create on level of toolbar menus. Recursive function.
  * @param {anychart.ui.Toolbar|anychart.ui.menu.Menu|anychart.ui.menu.SubMenu} menu
  * @param {Object.<string, anychart.ui.Toolbar.Item>} model
  * @private
  */
-anychart.ui.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) {
+anychart.ui.Toolbar.prototype.makeLevel_ = function(menu, model) {
   var sortedModel = [];
 
   for (var key in model) {
@@ -221,7 +222,6 @@ anychart.ui.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) {
   for (var i = 0; i < sortedModel.length; i++) {
     var itemData = sortedModel[i];
     var hasIcon = !!itemData['iconClass'];
-    var newItem;
 
     if (!itemData['text']) {
       // Separator.
@@ -266,12 +266,18 @@ anychart.ui.Toolbar.prototype.createButtonOrItem_ = function(menu, model) {
 
   if (menu instanceof anychart.ui.Toolbar) {
     buttonOrItem = new goog.ui.ToolbarButton(model['text']);
+    // Only push top level buttons, on toolbar itself.
+    if (model['iconClass']) {
+      this.itemsWithIcons_.push(buttonOrItem);
+    }
   } else if (menu instanceof anychart.ui.menu.Menu || menu instanceof anychart.ui.menu.SubMenu) {
     buttonOrItem = new anychart.ui.menu.Item(model['text']);
   }
 
   buttonOrItem.setModel(model);
   this.addItemToMenu_(menu, buttonOrItem);
+
+  this.setIconTo_(buttonOrItem, model['iconClass']);
 };
 
 
@@ -283,6 +289,8 @@ anychart.ui.Toolbar.prototype.createButtonOrItem_ = function(menu, model) {
  */
 anychart.ui.Toolbar.prototype.createMenu_ = function(menu, model) {
   var subMenu, menuButton;
+  var hasIcon = model['iconClass'];
+
   if (menu instanceof anychart.ui.Toolbar) {
     // Top level menus are MenuButtons with Menu attached to it.
     subMenu = new anychart.ui.menu.Menu(void 0, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
@@ -292,8 +300,15 @@ anychart.ui.Toolbar.prototype.createMenu_ = function(menu, model) {
     subMenu = new anychart.ui.menu.SubMenu(model['text'], void 0, true);
   }
 
-  this.makeToolbarMenus_(subMenu, model['subMenu']);
-  this.addItemToMenu_(menu, menuButton || subMenu);
+
+  this.makeLevel_(subMenu, model['subMenu']);
+
+  var topLevelItem = menuButton || subMenu;
+  this.addItemToMenu_(menu, topLevelItem);
+  topLevelItem.setModel(model);
+  if (hasIcon) {
+    this.setIconTo_(topLevelItem, model['iconClass']);
+  }
 };
 
 
@@ -306,7 +321,7 @@ anychart.ui.Toolbar.prototype.items = function(opt_value) {
   if (goog.isDef(opt_value)) {
     this.setModel(opt_value);
     this.removeChildren(true);
-    this.makeToolbarMenus_(this, opt_value);
+    this.makeLevel_(this, opt_value);
     return this;
   }
   return /** @type {Object.<string, anychart.ui.Toolbar.Item>}*/(this.getModel());
