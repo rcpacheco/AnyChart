@@ -179,15 +179,34 @@ anychart.ui.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) {
 
     if (!itemData['text']) {
       // Separator.
-      this.addChild(new anychart.ui.toolbarItems.Separator(), true);
+      if (menu instanceof anychart.ui.Toolbar) {
+        menu.addChild(new anychart.ui.toolbarItems.Separator(), true);
+      } else {
+        menu.addChild(new goog.ui.MenuSeparator(), true);
+      }
     } else if (itemData['subMenu']) {
       // Sub menu. Might be anychart.ui.menu.Menu or anychart.ui.menu.SubMenu.
+      if (menu instanceof anychart.ui.Toolbar) {
+        var subMenu = new anychart.ui.menu.Menu(void 0, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
+        this.makeToolbarMenus_(subMenu, itemData['subMenu']);
+        var menuButton = new anychart.ui.toolbarItems.MenuButton(itemData['text'], subMenu);
+        menu.addChild(menuButton, true);
+      } else if (menu instanceof anychart.ui.menu.Menu) {
+        var subMenu = new anychart.ui.menu.SubMenu(itemData['text'], void 0, true);
+        this.makeToolbarMenus_(subMenu, itemData['subMenu']);
+      }
 
     } else {
       // Menu item, or button.
-      var button = new goog.ui.ToolbarButton(itemData['text']);
-      button.setModel(itemData);
-      this.addChild(button, true);
+      if (menu instanceof anychart.ui.Toolbar) {
+        var button = new goog.ui.ToolbarButton(itemData['text']);
+        button.setModel(itemData);
+        menu.addChild(button, true);
+      } else if (menu instanceof anychart.ui.menu.Menu || menu instanceof anychart.ui.menu.SubMenu) {
+        var item = new anychart.ui.menu.Item(itemData['text']);
+        item.setModel(itemData);
+        menu.addChild(item, true);
+      }
     }
   }
 
