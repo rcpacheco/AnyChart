@@ -40,6 +40,12 @@ anychart.ui.Toolbar = function() {
    */
   this.itemsComponents_;
 
+  /**
+   * Items with icons, succeptible to buttons mode change.
+   * @type {anychart.ui.toolbarItems.MenuButton|goog.ui.ToolbarButton|anychart.ui.menu.Item|anychart.ui.menu.SubMenu>}
+   */
+  this.itemsWithIcons = [];
+
   this.listen(goog.ui.Component.EventType.ACTION, this.handleAction_);
 };
 goog.inherits(anychart.ui.Toolbar, goog.ui.Toolbar);
@@ -160,12 +166,39 @@ anychart.ui.Toolbar.prototype.handleAction_ = function(e) {
 
 /**
  * Add menuItem to menu or subMenu.
- * @param {anychart.ui.ContextMenu|anychart.ui.menu.Menu|anychart.ui.menu.SubMenu} menu
+ * @param {anychart.ui.Toolbar|anychart.ui.menu.Menu|anychart.ui.menu.SubMenu} menu
  * @param {anychart.ui.menu.Item|goog.ui.MenuSeparator|anychart.ui.menu.SubMenu} item
  * @private
  */
 anychart.ui.Toolbar.prototype.addItemToMenu_ = function(menu, item) {
   anychart.utils.instanceOf(menu, anychart.ui.menu.SubMenu) ? menu.addItem(item) : menu.addChild(item, true);
+};
+
+
+/**
+ * Set icon to menu item.
+ * @param {anychart.ui.menu.Item|anychart.ui.menu.SubMenu} item
+ * @param {string=} opt_icon
+ * @param {number=} opt_index
+ * @private
+ */
+anychart.ui.Toolbar.prototype.setIconTo_ = function(item, opt_icon, opt_index) {
+  var element = item.getElement();
+  if (element) {
+    var iconElement = goog.dom.getElementsByTagNameAndClass(goog.dom.TagName.I, null, element)[0];
+    if (opt_icon) {
+      if (iconElement) {
+        goog.dom.classlist.set(iconElement, opt_icon);
+        goog.style.setElementShown(iconElement, true);
+      } else {
+        iconElement = goog.dom.createDom(goog.dom.TagName.I, opt_icon);
+        goog.a11y.aria.setState(iconElement, goog.a11y.aria.State.HIDDEN, true);
+        goog.dom.insertChildAt(element, iconElement, opt_index || 0);
+      }
+    } else {
+      if (iconElement) goog.style.setElementShown(iconElement, false);
+    }
+  }
 };
 
 
@@ -187,41 +220,80 @@ anychart.ui.Toolbar.prototype.makeToolbarMenus_ = function(menu, model) {
 
   for (var i = 0; i < sortedModel.length; i++) {
     var itemData = sortedModel[i];
+    var hasIcon = !!itemData['iconClass'];
+    var newItem;
 
     if (!itemData['text']) {
       // Separator.
-      if (menu instanceof anychart.ui.Toolbar) {
-        this.addItemToMenu_(menu, new anychart.ui.toolbarItems.Separator());
-      } else {
-        this.addItemToMenu_(menu, new goog.ui.MenuSeparator());
-      }
+      this.createSeparator_(menu);
     } else if (itemData['subMenu']) {
       // Sub menu. Might be anychart.ui.menu.Menu or anychart.ui.menu.SubMenu.
-      if (menu instanceof anychart.ui.Toolbar) {
-        var subMenu = new anychart.ui.menu.Menu(void 0, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
-        this.makeToolbarMenus_(subMenu, itemData['subMenu']);
-        var menuButton = new anychart.ui.toolbarItems.MenuButton(itemData['text'], subMenu);
-        this.addItemToMenu_(menu, menuButton);
-      } else if (menu instanceof anychart.ui.menu.Menu || menu instanceof anychart.ui.menu.SubMenu) {
-        var subMenu = new anychart.ui.menu.SubMenu(itemData['text'], void 0, true);
-        this.makeToolbarMenus_(subMenu, itemData['subMenu']);
-        this.addItemToMenu_(menu, subMenu);
-      }
-
+      this.createMenu_(menu, itemData);
     } else {
       // Menu item, or button.
-      if (menu instanceof anychart.ui.Toolbar) {
-        var button = new goog.ui.ToolbarButton(itemData['text']);
-        button.setModel(itemData);
-        this.addItemToMenu_(menu, button);
-      } else if (menu instanceof anychart.ui.menu.Menu || menu instanceof anychart.ui.menu.SubMenu) {
-        var item = new anychart.ui.menu.Item(itemData['text']);
-        item.setModel(itemData);
-        this.addItemToMenu_(menu, item);
-      }
+      this.createButtonOrItem_(menu, itemData);
     }
   }
 
+};
+
+
+/**
+ *
+ * @param {} menu
+ * @private
+ */
+anychart.ui.Toolbar.prototype.createSeparator_ = function(menu) {
+  var separator;
+  if (menu instanceof anychart.ui.Toolbar) {
+    separator = new anychart.ui.toolbarItems.Separator();
+  } else {
+    separator = new goog.ui.MenuSeparator();
+  }
+
+  this.addItemToMenu_(menu, separator);
+};
+
+
+/**
+ *
+ * @param {anychart.ui.Toolbar|anychart.ui.menu.Menu|anychart.ui.menu.SubMenu} menu
+ * @param model
+ * @private
+ */
+anychart.ui.Toolbar.prototype.createButtonOrItem_ = function(menu, model) {
+  var buttonOrItem;
+
+  if (menu instanceof anychart.ui.Toolbar) {
+    buttonOrItem = new goog.ui.ToolbarButton(model['text']);
+  } else if (menu instanceof anychart.ui.menu.Menu || menu instanceof anychart.ui.menu.SubMenu) {
+    buttonOrItem = new anychart.ui.menu.Item(model['text']);
+  }
+
+  buttonOrItem.setModel(model);
+  this.addItemToMenu_(menu, buttonOrItem);
+};
+
+
+/**
+ *
+ * @param menu
+ * @param model
+ * @private
+ */
+anychart.ui.Toolbar.prototype.createMenu_ = function(menu, model) {
+  var subMenu, menuButton;
+  if (menu instanceof anychart.ui.Toolbar) {
+    // Top level menus are MenuButtons with Menu attached to it.
+    subMenu = new anychart.ui.menu.Menu(void 0, anychart.ui.menu.ToolbarMenuRenderer.getInstance());
+    menuButton = new anychart.ui.toolbarItems.MenuButton(model['text'], subMenu);
+  } else if (menu instanceof anychart.ui.menu.Menu || menu instanceof anychart.ui.menu.SubMenu) {
+    // All other menus are just SubMenu's.
+    subMenu = new anychart.ui.menu.SubMenu(model['text'], void 0, true);
+  }
+
+  this.makeToolbarMenus_(subMenu, model['subMenu']);
+  this.addItemToMenu_(menu, menuButton || subMenu);
 };
 
 
