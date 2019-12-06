@@ -625,7 +625,16 @@ anychart.ganttModule.Column.prototype.labelsSettingsInvalidated_ = function(even
      */
     if (signal & anychart.Signal.NEEDS_REDRAW_LABELS) { // If signal has anychart.Signal.NEEDS_REDRAW_LABELS.
       this.dataGrid_.partialLabels.reset = true;
-      this.dataGrid_.controller.resetTimeouts();
+
+      /*
+        Everything suggests that this one line is causing all the troubles with dataGrid settings with isAsync(true)
+        The sad part is that I cannot say why exactly. I understand that this one removes all timeouts
+        while there is timeout which supposedly would apply new dataGrid (and column and labels) settings.
+        But I am not sure which side effects will commenting this line out will bring. And also there is
+        a chance that fix I was looking for lies someplace but here.
+       */
+      // this.dataGrid_.controller.resetTimeouts();
+
       this.dataGrid_.interactivityHandler.dispatchEvent(anychart.enums.EventType.WORKING_CANCEL);
       this.markConsistent(state); //Reinvalidate. Kind of elegant hack.
     }
