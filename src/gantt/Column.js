@@ -633,7 +633,7 @@ anychart.ganttModule.Column.prototype.labelsSettingsInvalidated_ = function(even
         But I am not sure which side effects will commenting this line out will bring. And also there is
         a chance that fix I was looking for lies someplace but here.
        */
-      // this.dataGrid_.controller.resetTimeouts();
+      this.dataGrid_.controller.resetTimeouts();
 
       this.dataGrid_.interactivityHandler.dispatchEvent(anychart.enums.EventType.WORKING_CANCEL);
       this.markConsistent(state); //Reinvalidate. Kind of elegant hack.
