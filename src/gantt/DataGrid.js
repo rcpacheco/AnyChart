@@ -1027,8 +1027,12 @@ anychart.ganttModule.DataGrid.prototype.columnInvalidated_ = function(event) {
 
   /*
     Fix for case when we consequently apply changes to several columns in async mode.
-    When second signal arrives first invalidation already took place and second time signal won't be emitted.
-    To emit signal and schedule settings reapplication we need to make data grid consistent again.
+
+    When second signal arrives first invalidation already took place and second time
+    signal won't be emitted.
+
+    To emit signal and schedule settings reapplication we need to make data grid
+    consistent again.
    */
   if (anychart.isAsync() && event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS)) {
     this.markConsistent(state);
