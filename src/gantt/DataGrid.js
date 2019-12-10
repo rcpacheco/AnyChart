@@ -1034,7 +1034,11 @@ anychart.ganttModule.DataGrid.prototype.columnInvalidated_ = function(event) {
     To emit signal which would schedule settings reapplication we need to make data
     grid consistent again.
    */
-  if (anychart.isAsync() && event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS)) {
+  if (
+    anychart.isAsync() &&
+    event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS) &&
+    this.container_ // This is to avoid invoking chart.drawInternal() before container is set.
+  ) {
     this.markConsistent(state);
   }
 
