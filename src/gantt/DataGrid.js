@@ -1025,6 +1025,22 @@ anychart.ganttModule.DataGrid.prototype.columnInvalidated_ = function(event) {
       this.partialLabels.reset = true;
   }
 
+  /*
+    Fix for case when we consequently apply changes to several columns in async mode.
+
+    When second signal arrives first invalidation already took place and second time
+    signal won't be emitted.
+
+    To emit signal which would schedule settings reapplication we need to make data
+    grid consistent again.
+   */
+  if (anychart.isAsync() &&
+      event.hasSignal(anychart.Signal.NEEDS_REDRAW_LABELS) &&
+      this.container()) // This is to avoid invoking chart.drawInternal() before container is set.
+  {
+    this.markConsistent(state);
+  }
+
   var redrawChart = false;
 
   if (this.getOption('fixedColumns') && event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED | anychart.Signal.BOUNDS_CHANGED)) {
