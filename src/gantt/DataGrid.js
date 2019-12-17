@@ -462,7 +462,7 @@ anychart.ganttModule.DataGrid.prototype.collapseExpandItem = function(itemIndex,
       state = goog.isDef(state) ? state : false;
 
       item.meta(anychart.enums.GanttDataFields.COLLAPSED, state);
-      /** @type {anychart.ganttModule.Chart}*/ (this.interactivityHandler).dispatchDetachedEvent(eventObj);
+      /** @type {anychart.ganttModule.Chart} */ (this.interactivityHandler).dispatchDetachedEvent(eventObj);
     } else if (anychart.ganttModule.BaseGrid.isParent(item)) {
       // Regular expand/collapse condition and action.
 
