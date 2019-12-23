@@ -2302,7 +2302,7 @@ anychart.ganttModule.BaseGrid.prototype.drawRowFills = function() {
  * @private
  */
 anychart.ganttModule.BaseGrid.prototype.mouseWheelHandler_ = function(e) {
-  if (anychart.window['anychart']['ui']['ContextMenu']) {
+  if (anychart.anychart['ui']['ContextMenu']) {
     if (this.interactivityHandler.contextMenu) {
       var menu = this.interactivityHandler.contextMenu();
       if (menu.isVisible()) menu.hide();

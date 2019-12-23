@@ -353,7 +353,7 @@ anychart.fromXml = function(xmlConfig) {
 //  Default font settings
 //
 //----------------------------------------------------------------------------------------------------------------------
-anychart.window['anychart'] = anychart.window['anychart'] || {};
+anychart.anychart = anychart.window['anychart'] = anychart.window['anychart'] || {};
 
 
 /**
@@ -361,8 +361,8 @@ anychart.window['anychart'] = anychart.window['anychart'] || {};
  * @type {string|number}
  *
  */
-//anychart.window['anychart']['fontSize'] = '12px';
-anychart.window['anychart']['fontSize'] = '13px';
+//anychart.anychart['fontSize'] = '12px';
+anychart.anychart['fontSize'] = '13px';
 
 
 /**
@@ -370,8 +370,8 @@ anychart.window['anychart']['fontSize'] = '13px';
  * @type {string}
  *
  */
-//anychart.window['anychart']['fontColor'] = '#000';
-anychart.window['anychart']['fontColor'] = '#7c868e'; //colorAxisFont
+//anychart.anychart['fontColor'] = '#000';
+anychart.anychart['fontColor'] = '#7c868e'; //colorAxisFont
 
 
 /**
@@ -379,8 +379,8 @@ anychart.window['anychart']['fontColor'] = '#7c868e'; //colorAxisFont
  * @type {string}
  *
  */
-//anychart.window['anychart']['fontFamily'] = 'Arial';
-anychart.window['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif";
+//anychart.anychart['fontFamily'] = 'Arial';
+anychart.anychart['fontFamily'] = "'Verdana', Helvetica, Arial, sans-serif";
 
 
 /**
@@ -388,7 +388,7 @@ anychart.window['anychart']['fontFamily'] = "'Verdana', Helvetica, Arial, sans-s
  * @type {string}
  *
  */
-anychart.window['anychart']['textDirection'] = acgraph.vector.Text.Direction.LTR;
+anychart.anychart['textDirection'] = acgraph.vector.Text.Direction.LTR;
 
 
 //endregion
@@ -620,7 +620,7 @@ anychart.mergedThemeClones_ = [];
  */
 anychart.getThemes = function() {
   if (!anychart.themes_.length) {
-    anychart.themes_ = [anychart.window['anychart']['themes'][anychart.DEFAULT_THEME] || {}];
+    anychart.themes_ = [anychart.anychart['themes'][anychart.DEFAULT_THEME] || {}];
 
     if (anychart.additionalThemes_.length)
       anychart.themes_ = goog.array.concat(anychart.themes_, anychart.additionalThemes_);
@@ -662,7 +662,7 @@ anychart.theme = function(opt_value) {
  * @param {string|Object} value
  */
 anychart.appendTheme = function(value) {
-  var clone = goog.isString(value) ? anychart.utils.recursiveClone(/** @type {Object} */(anychart.window['anychart']['themes'][value])) : value;
+  var clone = goog.isString(value) ? anychart.utils.recursiveClone(/** @type {Object} */(anychart.anychart['themes'][value])) : value;
   anychart.additionalThemes_.push(/** @type {Object} */(clone));
 
   anychart.themes_.length = 0;
@@ -722,12 +722,12 @@ anychart.getFullTheme = function(root) {
   anychart.performance.start('Theme compilation');
   var i;
   if (!anychart.themeClones_.length) {
-    anychart.themeClones_.push(anychart.window['anychart']['themes'][anychart.DEFAULT_THEME] || {});
+    anychart.themeClones_.push(anychart.anychart['themes'][anychart.DEFAULT_THEME] || {});
     anychart.mergedThemeClones_.push(anychart.themeClones_[0]);
   }
   for (i = anychart.themeClones_.length - 1; i < anychart.additionalThemes_.length; i++) {
     var themeToMerge = anychart.additionalThemes_[i];
-    var clone = anychart.utils.recursiveClone(goog.isString(themeToMerge) ? anychart.window['anychart']['themes'][themeToMerge] : themeToMerge);
+    var clone = anychart.utils.recursiveClone(goog.isString(themeToMerge) ? anychart.anychart['themes'][themeToMerge] : themeToMerge);
     anychart.themeClones_.push(goog.isObject(clone) ? clone : {});
     anychart.mergedThemeClones_.push({});
   }
