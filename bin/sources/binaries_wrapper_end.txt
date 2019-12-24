@@ -1,1 +1,1 @@
-%sif(isModule){return window.anychart}else{$_=window.anychart;$_.$=$;$_._=_}})%s;
+%s$_=window.anychart;$_.$=$;$_._=_;return $_})%s;

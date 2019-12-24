@@ -353,6 +353,12 @@ anychart.fromXml = function(xmlConfig) {
 //  Default font settings
 //
 //----------------------------------------------------------------------------------------------------------------------
+/**
+ * Reference to anychart.
+ * When we use anychart as module we remove it from window.
+ *
+ * @type {Object}
+ */
 anychart.anychart = anychart.window['anychart'] = anychart.window['anychart'] || {};
 
 

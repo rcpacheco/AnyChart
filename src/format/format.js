@@ -429,7 +429,9 @@ anychart.format.dateTimeSymbolsCache_ = {};
 anychart.format.getLocale = function(locale) {
   if (!goog.isObject(locale)) {
     locale = String(locale);
-    locale = anychart.format.mergedLocales[locale] || anychart.anychart['format']['locales'][locale];
+    locale = anychart.format.mergedLocales[locale] ||
+      anychart.anychart['format']['locales'][locale] ||
+      anychart.window['anychart'] ? anychart.window['anychart']['format']['locales'] : null;;
   }
   return locale || null;
 };
