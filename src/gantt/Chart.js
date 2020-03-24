@@ -316,6 +316,23 @@ anychart.ganttModule.Chart.prototype.scrollInvalidated_ = function(event) {
 
 
 /**
+ * Data grid invalidation handler.
+ * @param {anychart.SignalEvent} event - Event object.
+ * @private
+ */
+anychart.ganttModule.Chart.prototype.dataGridInvalidated_ = function(event) {
+  if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
+    var gridEnabled = /** @type {boolean} */(this.getDataGrid_().enabled());
+    anychart.core.Base.suspendSignalsDispatching(this.splitter());
+    this.splitter().enabled(gridEnabled);
+    anychart.core.Base.resumeSignalsDispatchingFalse(this.splitter());
+    this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
+  }
+  this.controller_.run();
+};
+
+
+/**
  * Gets/sets chart data.
  * @param {(anychart.treeDataModule.Tree|anychart.treeDataModule.View|Array.<Object>)=} opt_value - Data tree or raw data.
  * @param {anychart.enums.TreeFillingMethod=} opt_fillMethod - Fill method.
@@ -415,9 +432,7 @@ anychart.ganttModule.Chart.prototype.getDataGrid_ = function() {
     this.setupCreated('dataGrid', this.dg_);
     this.dg_.zIndex(anychart.getFlatTheme('defaultDataGrid')['zIndex']);
     this.dg_.setInteractivityHandler(this);
-    this.dg_.listenSignals(function() {
-      this.controller_.run();
-    }, this);
+    this.dg_.listenSignals(this.dataGridInvalidated_, this);
   }
 
   return this.dg_;
