@@ -322,10 +322,6 @@ anychart.ganttModule.Chart.prototype.scrollInvalidated_ = function(event) {
  */
 anychart.ganttModule.Chart.prototype.dataGridInvalidated_ = function(event) {
   if (event.hasSignal(anychart.Signal.ENABLED_STATE_CHANGED)) {
-    var gridEnabled = /** @type {boolean} */(this.getDataGrid_().enabled());
-    anychart.core.Base.suspendSignalsDispatching(this.splitter());
-    this.splitter().enabled(gridEnabled);
-    anychart.core.Base.resumeSignalsDispatchingFalse(this.splitter());
     this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW);
   }
   this.controller_.run();
@@ -447,14 +443,7 @@ anychart.ganttModule.Chart.prototype.getDataGrid_ = function() {
  */
 anychart.ganttModule.Chart.prototype.dataGrid = function(opt_enabled) {
   if (goog.isDef(opt_enabled)) {
-    if (this.getDataGrid_().enabled() != opt_enabled) {
-      anychart.core.Base.suspendSignalsDispatching(this.getDataGrid_(), this.splitter());
-      this.getDataGrid_().enabled(opt_enabled);
-      this.splitter().enabled(opt_enabled);
-      anychart.core.Base.resumeSignalsDispatchingFalse(this.getDataGrid_(), this.splitter()); //We don't need to send any signal.
-
-      this.invalidate(anychart.ConsistencyState.BOUNDS, anychart.Signal.NEEDS_REDRAW); //Invalidate a whole chart.
-    }
+    this.getDataGrid_().enabled(opt_enabled);
     return this;
   }
   return this.getDataGrid_();
@@ -1160,7 +1149,10 @@ anychart.ganttModule.Chart.prototype.drawContent = function(bounds) {
         this.controller_.availableHeight(newAvailableHeight);
       }
 
-      if (this.dg_.enabled()) {
+      var isDataGridEnabled = this.dg_.enabled();
+      this.splitter_.enabled(isDataGridEnabled);
+
+      if (isDataGridEnabled) {
         var b1 = this.splitter_.getLeftBounds();
         var b2 = this.splitter_.getRightBounds();
         this.dg_.bounds().set(b1);
