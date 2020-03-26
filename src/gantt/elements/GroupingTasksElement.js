@@ -51,7 +51,7 @@ anychart.ganttModule.elements.GroupingTasksElement.prototype.getPaletteNormalStr
 
 /** @inheritDoc */
 anychart.ganttModule.elements.GroupingTasksElement.prototype.getPointSettingsResolutionOrder = function() {
-  return this.pointSettingsResolution || (this.pointSettingsResolution = [this.getType(), anychart.enums.TLElementTypes.TASKS, 'actual']);
+  return this.pointSettingsResolution || (this.pointSettingsResolution = [this.getType()]);
 };
 
 
