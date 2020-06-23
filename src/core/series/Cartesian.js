@@ -314,9 +314,12 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
 /** @inheritDoc */
 anychart.core.series.Cartesian.prototype.getSingleLabelsFactoryElement = function (factories, settings, index, positionProvider, formatProvider, opt_position) {
   var label = anychart.core.series.Cartesian.base(this, 'getSingleLabelsFactoryElement', factories, settings, index, positionProvider, formatProvider, opt_position);
-  if (this.xScale().mode() == anychart.enums.OrdinalScaleMode.CONTINUOUS) {
+  var xScale = this.xScale();
+
+  // It prevent last and first label clipping on continuous series.
+  if (anychart.utils.instanceOf(xScale, anychart.scales.Ordinal) && xScale.mode() == anychart.enums.OrdinalScaleMode.CONTINUOUS) {
     var isLast = this.iterator.meta(anychart.core.series.Cartesian.SUPPORTED_META_ITEMS.IS_LAST_DATA_POINT);
-    var isFirst = this.iterator.meta(anychart.core.series.Cartesian.SUPPORTED_META_ITEMS.IS_LAST_DATA_POINT);
+    var isFirst = this.iterator.meta(anychart.core.series.Cartesian.SUPPORTED_META_ITEMS.IS_FIRST_DATA_POINT);
 
     if (isFirst) {
       label.autoAnchor(anychart.enums.Anchor.LEFT_CENTER);
