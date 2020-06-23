@@ -301,6 +301,22 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
 };
 
 
+/** @inheritDoc */
+anychart.core.series.Cartesian.prototype.getSingleLabelsFactoryElement = function (factories, settings, index, positionProvider, formatProvider, opt_position) {
+  var label = anychart.core.series.Cartesian.base(this, 'getSingleLabelsFactoryElement', factories, settings, index, positionProvider, formatProvider, opt_position);
+  if (this.xScale().mode() == anychart.enums.OrdinalScaleMode.CONTINUOUS) {
+    var isLast = this.iterator.meta('isLast');
+    var isFirst = this.iterator.meta('isFirst');
+
+    if (isFirst) {
+      label.autoAnchor(anychart.enums.Anchor.LEFT_BOTTOM);
+    } else if (isLast) {
+      label.autoAnchor(anychart.enums.Anchor.RIGHT_BOTTOM);
+    }
+  }
+  return label;
+};
+
 //endregion
 //region --- Path manager interface methods
 /** @inheritDoc */
@@ -631,7 +647,18 @@ anychart.core.series.Cartesian.prototype.includeAllPoints = function() {
   return false;
 };
 
+anychart.core.series.Cartesian.prototype.makePositionMeta = function (rowInfo) {
+  var currentIndex = rowInfo.getRawDataIndex();
+  var rowsCount = rowInfo.getRowsCount() - 1;
 
+  rowInfo.meta('isFirst', currentIndex == 0);
+  rowInfo.meta('isLast', currentIndex == rowsCount);
+};
+
+anychart.core.series.Cartesian.prototype.prepareMetaMakers = function (yNames, yColumns) {
+  anychart.core.series.Cartesian.base(this, 'prepareMetaMakers', yNames, yColumns);
+  this.metaMakers.push(this.makePositionMeta);
+};
 //endregion
 //region --- Drawing plan related checkers
 //----------------------------------------------------------------------------------------------------------------------
