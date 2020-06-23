@@ -309,9 +309,9 @@ anychart.core.series.Cartesian.prototype.getSingleLabelsFactoryElement = functio
     var isFirst = this.iterator.meta('isFirst');
 
     if (isFirst) {
-      label.autoAnchor(anychart.enums.Anchor.LEFT_BOTTOM);
+      label.autoAnchor(anychart.enums.Anchor.LEFT_CENTER);
     } else if (isLast) {
-      label.autoAnchor(anychart.enums.Anchor.RIGHT_BOTTOM);
+      label.autoAnchor(anychart.enums.Anchor.RIGHT_CENTER);
     }
   }
   return label;
