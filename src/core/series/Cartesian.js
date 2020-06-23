@@ -67,6 +67,16 @@ anychart.core.series.Cartesian.prototype.SUPPORTED_CONSISTENCY_STATES = anychart
 anychart.core.series.Cartesian.prototype.SUPPORTED_SIGNALS = anychart.core.series.Base.prototype.SUPPORTED_SIGNALS;
 
 
+/**
+ * Contains key names that cartesian series uses for store meta information inside data.
+ *
+ * @enum {string}
+ */
+anychart.core.series.Cartesian.SUPPORTED_META_ITEMS = {
+  // todo (A.Chengaev) - Find all meta keys cartesian series use and write it here.
+  IS_FIRST_DATA_POINT: 'isFirstDataPoint',
+  IS_LAST_DATA_POINT: 'isLastDataPoint'
+};
 //endregion
 //region --- Typedefs
 //------------------------------------------------------------------------------
@@ -305,8 +315,8 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
 anychart.core.series.Cartesian.prototype.getSingleLabelsFactoryElement = function (factories, settings, index, positionProvider, formatProvider, opt_position) {
   var label = anychart.core.series.Cartesian.base(this, 'getSingleLabelsFactoryElement', factories, settings, index, positionProvider, formatProvider, opt_position);
   if (this.xScale().mode() == anychart.enums.OrdinalScaleMode.CONTINUOUS) {
-    var isLast = this.iterator.meta('isLast');
-    var isFirst = this.iterator.meta('isFirst');
+    var isLast = this.iterator.meta(anychart.core.series.Cartesian.SUPPORTED_META_ITEMS.IS_LAST_DATA_POINT);
+    var isFirst = this.iterator.meta(anychart.core.series.Cartesian.SUPPORTED_META_ITEMS.IS_LAST_DATA_POINT);
 
     if (isFirst) {
       label.autoAnchor(anychart.enums.Anchor.LEFT_CENTER);
@@ -647,14 +657,20 @@ anychart.core.series.Cartesian.prototype.includeAllPoints = function() {
   return false;
 };
 
+/**
+ * Set meta information about point position.
+ *
+ * @param {Object} rowInfo - Object with point info.
+ */
 anychart.core.series.Cartesian.prototype.makePositionMeta = function (rowInfo) {
   var currentIndex = rowInfo.getRawDataIndex();
   var rowsCount = rowInfo.getRowsCount() - 1;
 
-  rowInfo.meta('isFirst', currentIndex == 0);
-  rowInfo.meta('isLast', currentIndex == rowsCount);
+  rowInfo.meta(anychart.core.series.Cartesian.SUPPORTED_META_ITEMS.IS_FIRST_DATA_POINT, currentIndex == 0);
+  rowInfo.meta(anychart.core.series.Cartesian.SUPPORTED_META_ITEMS.IS_LAST_DATA_POINT, currentIndex == rowsCount);
 };
 
+/** @inheritDoc */
 anychart.core.series.Cartesian.prototype.prepareMetaMakers = function (yNames, yColumns) {
   anychart.core.series.Cartesian.base(this, 'prepareMetaMakers', yNames, yColumns);
   this.metaMakers.push(this.makePositionMeta);
