@@ -312,7 +312,7 @@ anychart.core.series.Cartesian.prototype.prepareData = function() {
 
 
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.getSingleLabelsFactoryElement = function (factories, settings, index, positionProvider, formatProvider, opt_position) {
+anychart.core.series.Cartesian.prototype.getSingleLabelsFactoryElement = function(factories, settings, index, positionProvider, formatProvider, opt_position) {
   var label = anychart.core.series.Cartesian.base(this, 'getSingleLabelsFactoryElement', factories, settings, index, positionProvider, formatProvider, opt_position);
   var xScale = this.xScale();
 
@@ -665,7 +665,7 @@ anychart.core.series.Cartesian.prototype.includeAllPoints = function() {
  *
  * @param {Object} rowInfo - Object with point info.
  */
-anychart.core.series.Cartesian.prototype.makePositionMeta = function (rowInfo) {
+anychart.core.series.Cartesian.prototype.makePositionMeta = function(rowInfo) {
   var currentIndex = rowInfo.getRawDataIndex();
   var rowsCount = rowInfo.getRowsCount() - 1;
 
@@ -674,7 +674,7 @@ anychart.core.series.Cartesian.prototype.makePositionMeta = function (rowInfo) {
 };
 
 /** @inheritDoc */
-anychart.core.series.Cartesian.prototype.prepareMetaMakers = function (yNames, yColumns) {
+anychart.core.series.Cartesian.prototype.prepareMetaMakers = function(yNames, yColumns) {
   anychart.core.series.Cartesian.base(this, 'prepareMetaMakers', yNames, yColumns);
   this.metaMakers.push(this.makePositionMeta);
 };

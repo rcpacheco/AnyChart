@@ -2582,13 +2582,13 @@ anychart.core.series.Base.prototype.isMakerSettingsChanged_ = function(setting, 
   var currentFactory = /** @type {anychart.core.ui.MarkersFactory} */(factories[1] || mainFactory);
 
   return mainFactory.getSettingsChangedStatesObj()[setting] ||
-  currentFactory.getSettingsChangedStatesObj()[setting] ||
-  (factories[2] && goog.isDef(factories[2][setting])) ||
-  (factories[3] && goog.isDef(factories[3][setting]));
+      currentFactory.getSettingsChangedStatesObj()[setting] ||
+      (factories[2] && goog.isDef(factories[2][setting])) ||
+      (factories[3] && goog.isDef(factories[3][setting]));
 };
 
 /**
- * Create marker factory item, setup position provider to it and set appearance settings.
+ * Create marker factory item, set position provider to it and setup appearance settings.
  *
  * @param {Array.<anychart.core.ui.MarkersFactory|*>} factories [seriesNormal, seriesState, pointNormal, pointState]
  * @param {Array} settings [chartNormal, seriesNormal, pointNormal, chartState, seriesState, pointState, chartExtremumNormal, seriesExtremumNormal, pointExtremumNormal, chartExtremumState, seriesExtremumState, pointExtremumState]
@@ -2597,7 +2597,7 @@ anychart.core.series.Base.prototype.isMakerSettingsChanged_ = function(setting, 
  *
  * @return {anychart.core.ui.MarkersFactory.Marker} - Marker instance.
  */
-anychart.core.series.Base.prototype.getSingleMarkersFactoryElement = function (factories, settings, index, positionProvider) {
+anychart.core.series.Base.prototype.getSingleMarkersFactoryElement = function(factories, settings, index, positionProvider) {
   var mainFactory = /** @type {anychart.core.ui.LabelsFactory|anychart.core.ui.MarkersFactory} */(factories[0]);
   var element = mainFactory.getMarker(/** @type {number} */(index));
   if (element) {
@@ -2621,12 +2621,13 @@ anychart.core.series.Base.prototype.getSingleMarkersFactoryElement = function (f
 
   if (goog.isDef(color)) {
     var autoFill = mainFactory == this.normal_.outlierMarkers() ? this.getOutliersFill(color) : this.getMarkerFill(color);
-    var autoStroke = anychart.color.darken(autoFill);
     var isFillChanged = this.isMakerSettingsChanged_('fill', factories);
-    var isStrokeChanged = this.isMakerSettingsChanged_('stroke', factories);
 
     if (!isFillChanged && anychart.color.isNotNullColor(autoFill)) {
       element.setAutoFill(autoFill);
+
+      var autoStroke = anychart.color.darken(autoFill);
+      var isStrokeChanged = this.isMakerSettingsChanged_('stroke', factories);
       if (!isStrokeChanged && anychart.color.isNotNullColor(autoStroke))
         element.setAutoStroke(autoStroke);
     }
@@ -2641,7 +2642,7 @@ anychart.core.series.Base.prototype.getSingleMarkersFactoryElement = function (f
 /**
  * Create and return labels factory item instance.
  *
- * @param {Array.<anychart.core.ui.MarkersFactory|anychart.core.ui.LabelsFactory|*>} factories [seriesNormal, seriesState, pointNormal, pointState]
+ * @param {Array.<anychart.core.ui.LabelsFactory|*>} factories [seriesNormal, seriesState, pointNormal, pointState]
  * @param {Array} settings [chartNormal, seriesNormal, pointNormal, chartState, seriesState, pointState, chartExtremumNormal, seriesExtremumNormal, pointExtremumNormal, chartExtremumState, seriesExtremumState, pointExtremumState]
  * @param {number|undefined} index - Index of point.
  * @param {*} positionProvider - Object with info about position.
@@ -2650,7 +2651,7 @@ anychart.core.series.Base.prototype.getSingleMarkersFactoryElement = function (f
  *
  * @return {anychart.core.ui.LabelsFactory.Label} - Label instance.
  */
-anychart.core.series.Base.prototype.getSingleLabelsFactoryElement = function (factories, settings, index, positionProvider, formatProvider, opt_position) {
+anychart.core.series.Base.prototype.getSingleLabelsFactoryElement = function(factories, settings, index, positionProvider, formatProvider, opt_position) {
   var mainFactory = /** @type {anychart.core.ui.LabelsFactory} */(factories[0]);
   var element = mainFactory.getLabel(/** @type {number} */(index));
   if (element) {
@@ -2691,7 +2692,7 @@ anychart.core.series.Base.prototype.getSingleLabelsFactoryElement = function (fa
  *
  * @return {anychart.core.ui.MarkersFactory.Marker|anychart.core.ui.LabelsFactory.Label} - Item instance.
  */
-anychart.core.series.Base.prototype.drawSingleFactoryElement = function (factories, settings, index, positionProvider, formatProvider, callDraw, opt_position) {
+anychart.core.series.Base.prototype.drawSingleFactoryElement = function(factories, settings, index, positionProvider, formatProvider, callDraw, opt_position) {
   var element = formatProvider ?
       this.getSingleLabelsFactoryElement(factories, settings, index, positionProvider, formatProvider, opt_position) :
       this.getSingleMarkersFactoryElement(factories, settings, index, positionProvider);
