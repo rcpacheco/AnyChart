@@ -68,11 +68,7 @@ anychart.exportsModule.Exports = function() {
    * @type {anychart.exportsModule.Exports.ClientsideConfig}
    * @private
    */
-  this.clientsideConfig_ = {
-    'path': 'https://cdn.anychart.com/3rd/',
-    'enabled': true,
-    'fallback': true
-  };
+  this.clientsideConfig_ = {};
 };
 
 
@@ -325,6 +321,12 @@ anychart.exportsModule.Exports.prototype.applyDefaults = function() {
     'width': 1200,
     'height': 800
   };
+
+  this.clientsideConfig_ = {
+    'path': 'https://cdn.anychart.com/3rd/',
+    'enabled': true,
+    'fallback': true
+  }
 };
 
 
