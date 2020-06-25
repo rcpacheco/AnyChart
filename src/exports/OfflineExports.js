@@ -323,12 +323,12 @@ anychart.exportsModule.offline.exportChartOffline = function(target, exportType,
           }
         } catch (e) {
           anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED, null, [], true);
-          failCallback();
+          failCallback(args);
         }
       })
       .thenCatch(function() {
         anychart.core.reporting.warning(anychart.enums.WarningCode.OFFLINE_EXPORT_FAILED, null, [], true);
-        failCallback();
+        failCallback(args);
       });
 
 };
