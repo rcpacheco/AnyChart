@@ -50,6 +50,7 @@ anychart.exportsModule.Exports = function() {
    * @private
    */
   this.pinterest_ = {};
+
   /**
    * Dependencies names.
    * @type {Object}
@@ -58,7 +59,7 @@ anychart.exportsModule.Exports = function() {
   this.externalDependencies_ = ['svg2pdf.min.js', 'jspdf.min.js', 'canvg.min.js'];
 
   /**
-   *
+   * This flag is set to true when all external dependencies are loaded.
    * @type {boolean}
    */
   this.isExternLoaded = false;
@@ -101,11 +102,10 @@ anychart.exportsModule.Exports.prototype.isClientsideEnabled = function() {
 
 
 /**
- * @typedef {{
- *    path: string,
- *    enabled: boolean,
- *    fallback: boolean
- * }}
+ * @typedef {Object}
+ * @property {boolean} [fallback] - Whether to use export server fallback.
+ * @property {string} [path] - Path to thirdparty dependencies.
+ * @property {boolean} [enabled] - If client side export enabled.
  */
 anychart.exportsModule.Exports.ClientsideConfig;
 
@@ -326,7 +326,7 @@ anychart.exportsModule.Exports.prototype.applyDefaults = function() {
     'path': 'https://cdn.anychart.com/3rd/',
     'enabled': true,
     'fallback': true
-  }
+  };
 };
 
 
