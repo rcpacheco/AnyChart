@@ -242,9 +242,10 @@ anychart.exportsModule.Exports.prototype.pinterest = function(opt_linkOrOptions,
 
 /**
  * Loads dependencies needed for offline export to work.
+ * @param {anychart.core.VisualBase} target - Export target.
  * @return {goog.Promise}
  */
-anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
+anychart.exportsModule.Exports.prototype.loadExternalDependencies = function(target) {
   var exports = goog.global['anychart']['exports'];
   if (exports && exports.isExternLoaded)
     this.isExternLoaded = true;
@@ -253,8 +254,11 @@ anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
     return goog.Promise.resolve();
   } else {
     var deps = this.externalDependencies_;
-    var depsUrl = this.getClientsidePath();
+
+    // Clientside settings should be resolved to take target settings into account.
+    var depsUrl = exports.getFinalSettings(target, 'clientside')['path'];
     depsUrl += goog.string.endsWith(depsUrl, '/') ? '' : '/'; //append slash if not present, to assemble correct path
+
     var proms = [];
     for (var i = 0; i < deps.length; i++) {
       var p = new goog.Promise(function(resolve, reject) {

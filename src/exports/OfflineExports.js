@@ -217,7 +217,7 @@ anychart.exportsModule.offline.saveSvgToFileType = function(target, svgElement, 
  * @param {Function} failCallback handles falling back to export server, should accept args param.
  */
 anychart.exportsModule.offline.exportChartOffline = function(target, exportType, args, successCallback, failCallback) {
-  anychart.exports.loadExternalDependencies()
+  anychart.exports.loadExternalDependencies(target)
       .then(function() {
         anychart.exports.isExternLoaded = true;
 
