@@ -6,11 +6,28 @@ goog.provide('anychart.exportsModule.offline');
  * @enum {string}
  */
 anychart.exportsModule.offline.MIME_TYPES = {
+  CSV: 'text/csv',
   PNG: 'image/png',
   JPG: 'image/jpeg',
+  PDF: 'application/pdf',
   SVG: 'image/svg+xml'
 };
 
+/**
+ * Try to save csv file using blob and shared buffer.
+ *
+ * @param {string} csv - Csv chart data.
+ * @param {string} fileName - File name to save.
+ * @param {Function} failCallback - On fail callback. Old browsers don't supports blobs and array buffers.
+ */
+anychart.exportsModule.offline.saveAsCsv = function(csv, fileName, failCallback) {
+  try {
+    var blob = new Blob([csv], {'type': anychart.exportsModule.offline.MIME_TYPES.CSV});
+    anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
+  } catch (e) {
+    failCallback();
+  }
+};
 
 /**
  *
@@ -333,6 +350,28 @@ anychart.exportsModule.offline.exportChartOffline = function(target, exportType,
 
 };
 
+/**
+ * Returns file extension depend on passed mime type.
+ *
+ * @param {anychart.exportsModule.offline.MIME_TYPES} type - File mime type.
+ * @returns {string} - File extension
+ */
+anychart.exportsModule.offline.getExtension = function (type) {
+  switch (type) {
+    case  anychart.exportsModule.offline.MIME_TYPES.SVG:
+      return '.svg';
+    case anychart.exportsModule.offline.MIME_TYPES.PNG:
+      return '.png';
+    case anychart.exportsModule.offline.MIME_TYPES.JPG:
+      return '.jpg';
+    case anychart.exportsModule.offline.MIME_TYPES.PDF:
+      return '.pdf';
+    case anychart.exportsModule.offline.MIME_TYPES.CSV:
+      return '.csv';
+  }
+
+  return '';
+};
 
 /**
  * Tries to open url using <a> element, falls back to window.open() if <a>.download not supported.
@@ -342,20 +381,9 @@ anychart.exportsModule.offline.exportChartOffline = function(target, exportType,
 anychart.exportsModule.offline.downloadDataUrl = function(dataUrlOrBlob, opt_filename) {
   var a = goog.dom.createElement('a');
   var blob = goog.isString(dataUrlOrBlob) ? anychart.exportsModule.offline.dataURItoBlob(dataUrlOrBlob) : dataUrlOrBlob;
-  switch (blob.type) {
-    case 'image/svg+xml':
-      opt_filename += '.svg';
-      break;
-    case 'image/png':
-      opt_filename += '.png';
-      break;
-    case 'image/jpeg':
-      opt_filename += '.jpg';
-      break;
-    case 'application/pdf':
-      opt_filename += '.pdf';
-      break;
-  }
+  var fileExtension = anychart.exportsModule.offline.getExtension(/**@type {anychart.exportsModule.offline.MIME_TYPES}*/(blob.type));
+
+  opt_filename += fileExtension;
 
   dataUrlOrBlob = goog.fs.url.createObjectUrl(blob);
   if (goog.isDef(a['download'])) {
