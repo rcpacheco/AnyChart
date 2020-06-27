@@ -54,8 +54,8 @@ anychart.exportsModule.offline.saveAsPdf = function(stage, svgDomElementOrDataUr
       pdf = new goog.global['jsPDF'](landscape ? 'l' : 'p', 'pt', paperSize || [pixelWidth, pixelHeight]);
 
       if (goog.isDef(font)) {
-        pdf.addFileToVFS('customFont.ttf', font);
-        pdf.addFont('customFont.ttf', fontName, 'normal');
+        pdf['addFileToVFS']('customFont.ttf', font);
+        pdf['addFont']('customFont.ttf', fontName, 'normal');
       }
 
       if (goog.isString(svgDomElementOrDataUrl)) {
@@ -72,8 +72,8 @@ anychart.exportsModule.offline.saveAsPdf = function(stage, svgDomElementOrDataUr
       pdf = new goog.global['jsPDF'](orientation, 'pt', [width, height]);
       
       if (goog.isDef(font)) {
-        pdf.addFileToVFS('customFont.ttf', font);
-        pdf.addFont('customFont.ttf', fontName, 'normal');
+        pdf['addFileToVFS']('customFont.ttf', font);
+        pdf['addFont']('customFont.ttf', fontName, 'normal');
       }
 
       if (goog.isString(svgDomElementOrDataUrl)) {
