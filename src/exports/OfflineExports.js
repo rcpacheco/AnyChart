@@ -29,7 +29,7 @@ anychart.exportsModule.offline.saveAsPdf = function(stage, svgDomElementOrDataUr
   opt_filename += '.pdf';
   var pdf;
 
-  var clientside = goog.global['anychart']['exports'].clientside();
+  var clientside = goog.global['anychart']['exports']['clientside']();
   var font = clientside['font'];
   font = font.indexOf(',') >= 0 ? font.substr(font.indexOf(',') + 1) : font;
   var fontName = clientside['fontName'] || 'Verdana';
