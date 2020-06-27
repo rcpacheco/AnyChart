@@ -29,6 +29,11 @@ anychart.exportsModule.offline.saveAsPdf = function(stage, svgDomElementOrDataUr
   opt_filename += '.pdf';
   var pdf;
 
+  var clientside = goog.global['anychart']['exports'].clientside();
+  var font = clientside['font'];
+  font = font.indexOf(',') >= 0 ? font.substr(font.indexOf(',') + 1) : font;
+  var fontName = clientside['fontName'] || 'Verdana';
+
   try {
     if (goog.isDef(paperSize) || goog.isDef(landscape)) {
       var size = acgraph.vector.normalizePageSize(paperSize, landscape);
@@ -48,6 +53,11 @@ anychart.exportsModule.offline.saveAsPdf = function(stage, svgDomElementOrDataUr
 
       pdf = new goog.global['jsPDF'](landscape ? 'l' : 'p', 'pt', paperSize || [pixelWidth, pixelHeight]);
 
+      if (goog.isDef(font)) {
+        pdf.addFileToVFS('customFont.ttf', font);
+        pdf.addFont('customFont.ttf', fontName, 'normal');
+      }
+
       if (goog.isString(svgDomElementOrDataUrl)) {
         pdf['addImage'](svgDomElementOrDataUrl, 'png', x, y, pixelWidth, pixelHeight);
       } else {
@@ -60,6 +70,12 @@ anychart.exportsModule.offline.saveAsPdf = function(stage, svgDomElementOrDataUr
       var height = stage.height();
       var orientation = width > height ? 'l' : 'p';
       pdf = new goog.global['jsPDF'](orientation, 'pt', [width, height]);
+      
+      if (goog.isDef(font)) {
+        pdf.addFileToVFS('customFont.ttf', font);
+        pdf.addFont('customFont.ttf', fontName, 'normal');
+      }
+
       if (goog.isString(svgDomElementOrDataUrl)) {
         pdf['addImage'](svgDomElementOrDataUrl, 'png', x, y, width, height);
       } else {
