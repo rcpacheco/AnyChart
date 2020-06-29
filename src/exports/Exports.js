@@ -55,7 +55,12 @@ anychart.exportsModule.Exports = function() {
    * @type {Object}
    * @private
    */
-  this.externalDependencies_ = ['svg2pdf.min.js', 'jspdf.min.js', 'canvg.min.js'];
+  this.externalDependencies_ = [
+    'svg2pdf.min.js',
+    'jspdf.min.js',
+    'canvg.min.js',
+    'xlsx.core.min.js' // Offline xlsx export.
+  ];
 
   /**
    *

@@ -365,7 +365,7 @@ anychart.exports.saveAsJson = function(target, json, opt_filename) {
  * @param {string} csv - Csv chart data.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.saveAsCsv = function (target, csv, opt_filename) {
+anychart.exports.saveAsCsv = function(target, csv, opt_filename) {
     var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
 
     anychart.exportsModule.offline.saveAsCsv(csv, fileName, function () {
@@ -382,17 +382,23 @@ anychart.exports.saveAsCsv = function (target, csv, opt_filename) {
 
 /**
  * Saves chart data as excel document.
- * @param {?anychart.core.VisualBase} target
- * @param {string} csv
+ *
+ * @param {?anychart.core.VisualBase} target - Chart instance.
+ * @param {string} csv - Csv chart data.
  * @param {string=} opt_filename file name to save.
  */
 anychart.exports.saveAsXlsx = function(target, csv, opt_filename) {
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.getFinalSettings(target, 'filename');
-  options['data'] = csv;
-  options['dataType'] = 'xlsx';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
+    var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
+
+    anychart.exportsModule.offline.saveAsXlsx(csv, fileName, function () {
+        var options = {};
+        options['file-name'] = fileName;
+        options['data'] = csv;
+        options['dataType'] = 'xlsx';
+        options['responseType'] = 'file';
+
+        acgraph.sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
+    });
 };
 
 

@@ -10,7 +10,8 @@ anychart.exportsModule.offline.MIME_TYPES = {
   PNG: 'image/png',
   JPG: 'image/jpeg',
   PDF: 'application/pdf',
-  SVG: 'image/svg+xml'
+  SVG: 'image/svg+xml',
+  XLSX: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 };
 
 /**
@@ -27,6 +28,42 @@ anychart.exportsModule.offline.saveAsCsv = function(csv, fileName, failCallback)
   } catch (e) {
     failCallback();
   }
+};
+
+/**
+ * Try to save xlsx file using blob and shared buffer.
+ *
+ * Uses external js library for xlsx create.
+ * @Link https://github.com/SheetJS/sheetjs
+ *
+ * @param {string} csv - Csv chart data.
+ * @param {string} fileName - File name to save.
+ * @param {Function} failCallback - On fail callback. Old browsers don't supports blobs and array buffers.
+ */
+anychart.exportsModule.offline.saveAsXlsx = function (csv, fileName, failCallback) {
+  anychart.exports.loadExternalDependencies()
+      .then(function () {
+        var XLSX = goog.global['XLSX'];
+
+        // Convert csv to array or arrays.
+        var csvParser = anychart.data.csv.parser();
+        var data = csvParser.parse(csv);
+
+        // Crete new xlsx book.
+        var book = XLSX.utils.book_new();
+        // Crete sheet and append data to it.
+        var sheetWithData = XLSX.utils.aoa_to_sheet(data);
+
+        // Link sheet with book.
+        XLSX.utils.book_append_sheet(book, sheetWithData, 'data');
+
+        // Save book as BufferArray.
+        var arrayBuffer = XLSX.write(book, {type: 'array'});
+        var blob = new Blob([arrayBuffer], {'type': anychart.exportsModule.offline.MIME_TYPES.XLSX});
+
+        anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
+      })
+      .thenCatch(failCallback)
 };
 
 /**
@@ -368,6 +405,8 @@ anychart.exportsModule.offline.getExtension = function (type) {
       return '.pdf';
     case anychart.exportsModule.offline.MIME_TYPES.CSV:
       return '.csv';
+    case anychart.exportsModule.offline.MIME_TYPES.XLSX:
+      return '.xlsx';
   }
 
   return '';
