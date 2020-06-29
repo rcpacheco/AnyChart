@@ -6,13 +6,17 @@ goog.provide('anychart.exportsModule.offline');
  * @enum {string}
  */
 anychart.exportsModule.offline.MIME_TYPES = {
-  CSV: 'text/csv',
   PNG: 'image/png',
   JPG: 'image/jpeg',
-  PDF: 'application/pdf',
   SVG: 'image/svg+xml',
-  XLSX: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  CSV: 'text/csv',
+  PDF: 'application/pdf',
+  JSON: 'application/json',
+  XLSX: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  XML: 'text/xml'
 };
+
+
 
 /**
  * Try to save csv file using blob and shared buffer.
@@ -30,6 +34,41 @@ anychart.exportsModule.offline.saveAsCsv = function(csv, fileName, failCallback)
   }
 };
 
+
+/**
+ * Try to save chart xml config file using blob and shared buffer.
+ *
+ * @param {string} xml - Xml chart config.
+ * @param {string} fileName - File name to save.
+ * @param {Function} failCallback - On fail callback. Old browsers don't supports blobs and array buffers.
+ */
+anychart.exportsModule.offline.saveAsXml = function(xml, fileName, failCallback) {
+  try {
+    var blob = new Blob([xml], {'type': anychart.exportsModule.offline.MIME_TYPES.XML});
+    anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
+  } catch (e) {
+    failCallback();
+  }
+};
+
+
+/**
+ * Try to save chart json config file using blob and shared buffer.
+ *
+ * @param {string} json - Json chart config.
+ * @param {string} fileName - File name to save.
+ * @param {Function} failCallback - On fail callback. Old browsers don't supports blobs and array buffers.
+ */
+anychart.exportsModule.offline.saveAsJson = function(json, fileName, failCallback) {
+  try {
+    var blob = new Blob([json], {'type': anychart.exportsModule.offline.MIME_TYPES.JSON});
+    anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
+  } catch (e) {
+    failCallback();
+  }
+};
+
+
 /**
  * Try to save xlsx file using blob and shared buffer.
  *
@@ -43,6 +82,17 @@ anychart.exportsModule.offline.saveAsCsv = function(csv, fileName, failCallback)
 anychart.exportsModule.offline.saveAsXlsx = function (csv, fileName, failCallback) {
   anychart.exports.loadExternalDependencies()
       .then(function () {
+        // Describe all used functions. Without it closure compile build with errors.
+        /**
+         * @type {{
+         *     write: Function,
+         *     utils: {
+         *         book_new: Function,
+         *         aoa_to_sheet: Function,
+         *         book_append_sheet: Function
+         *     }
+         * }}
+         */
         var XLSX = goog.global['XLSX'];
 
         // Convert csv to array or arrays.
@@ -63,7 +113,9 @@ anychart.exportsModule.offline.saveAsXlsx = function (csv, fileName, failCallbac
 
         anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
       })
-      .thenCatch(failCallback)
+      .thenCatch(function () {
+        failCallback();
+      });
 };
 
 /**

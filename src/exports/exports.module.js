@@ -328,33 +328,44 @@ anychart.exports.toSvg = function(target, container, opt_paperSizeOrWidthOrOptio
 
 /**
  * Saves chart config as XML document.
- * @param {?anychart.core.VisualBase} target
- * @param {string} xml
+ *
+ * @param {?anychart.core.VisualBase} target - Chart instance.
+ * @param {string} xml - Xml to save.
  * @param {string=} opt_filename file name to save.
  */
 anychart.exports.saveAsXml = function(target, xml, opt_filename) {
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.getFinalSettings(target, 'filename');
-  options['data'] = xml;
-  options['dataType'] = 'xml';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/xml', options);
+    var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
+
+    anychart.exportsModule.offline.saveAsXml(xml, fileName, function () {
+        var options = {};
+        options['file-name'] = fileName;
+        options['data'] = xml;
+        options['dataType'] = 'xml';
+        options['responseType'] = 'file';
+        acgraph.sendRequestToExportServer(acgraph.exportServer + '/xml', options);
+    });
 };
 
 
 /**
  * Saves chart config as XML document.
- * @param {?anychart.core.VisualBase} target
- * @param {string} json
+ *
+ * @param {?anychart.core.VisualBase} target - Chart instance.
+ * @param {string} json - Json to save
  * @param {string=} opt_filename file name to save.
  */
 anychart.exports.saveAsJson = function(target, json, opt_filename) {
-  var options = {};
-  options['file-name'] = opt_filename || anychart.exports.getFinalSettings(target, 'filename');
-  options['data'] = json;
-  options['dataType'] = 'json';
-  options['responseType'] = 'file';
-  acgraph.sendRequestToExportServer(acgraph.exportServer + '/json', options);
+    var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
+
+    anychart.exportsModule.offline.saveAsJson(json, fileName, function () {
+        var options = {};
+        options['file-name'] = fileName;
+        options['data'] = json;
+        options['dataType'] = 'json';
+        options['responseType'] = 'file';
+
+        acgraph.sendRequestToExportServer(acgraph.exportServer + '/json', options);
+    });
 };
 
 
