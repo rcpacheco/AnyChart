@@ -401,7 +401,10 @@ anychart.exports.saveAsCsv = function(target, csv, opt_filename) {
 anychart.exports.saveAsXlsx = function(target, csv, opt_filename) {
     var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
 
-    anychart.exportsModule.offline.saveAsXlsx(csv, fileName, function () {
+    /**
+     * Function that end request to anychart export server.
+     */
+    var performExportRequest = function() {
         var options = {};
         options['file-name'] = fileName;
         options['data'] = csv;
@@ -409,7 +412,24 @@ anychart.exports.saveAsXlsx = function(target, csv, opt_filename) {
         options['responseType'] = 'file';
 
         acgraph.sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
-    });
+    };
+
+    var clientside = anychart.exports.getFinalSettings(target, 'clientside');
+
+    var failCallback = function() {
+        if (clientside['fallback']) {
+            anychart.core.reporting.info('Offline export failed, falling back to server.');
+            performExportRequest();
+        } else {
+            anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+        }
+    };
+
+    if (clientside['enabled']) {
+        anychart.exportsModule.offline.saveAsXlsx(csv, fileName, failCallback);
+    } else {
+        performExportRequest();
+    }
 };
 
 

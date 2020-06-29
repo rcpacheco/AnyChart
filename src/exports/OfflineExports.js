@@ -30,7 +30,6 @@ anychart.exportsModule.offline.saveAsCsv = function(csv, fileName, failCallback)
     var blob = new Blob([csv], {'type': anychart.exportsModule.offline.MIME_TYPES.CSV});
     anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
   } catch (e) {
-    console.log(e);
     failCallback();
   }
 };
@@ -48,7 +47,6 @@ anychart.exportsModule.offline.saveAsXml = function(xml, fileName, failCallback)
     var blob = new Blob([xml], {'type': anychart.exportsModule.offline.MIME_TYPES.XML});
     anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
   } catch (e) {
-    console.log(e);
     failCallback();
   }
 };

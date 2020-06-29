@@ -286,9 +286,9 @@ anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
       proms.push(p);
     }
     return goog.Promise.all(proms)
-        .then(function () {
-          anychart.exports.isExternLoaded = true;
-        });
+      .then(function () {
+        anychart.exports.isExternLoaded = true;
+      });
   }
 };
 
