@@ -342,6 +342,7 @@ anychart.exports.saveAsXml = function(target, xml, opt_filename) {
         options['data'] = xml;
         options['dataType'] = 'xml';
         options['responseType'] = 'file';
+
         acgraph.sendRequestToExportServer(acgraph.exportServer + '/xml', options);
     });
 };
@@ -402,7 +403,7 @@ anychart.exports.saveAsXlsx = function(target, csv, opt_filename) {
     var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
 
     /**
-     * Function that end request to anychart export server.
+     * Function that send request to anychart export server.
      */
     var performExportRequest = function() {
         var options = {};

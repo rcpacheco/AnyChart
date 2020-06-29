@@ -82,33 +82,23 @@ anychart.exportsModule.offline.saveAsJson = function(json, fileName, failCallbac
 anychart.exportsModule.offline.saveAsXlsx = function (csv, fileName, failCallback) {
   anychart.exports.loadExternalDependencies()
       .then(function () {
-        // Describe all used functions. Without it closure compile build with errors.
-        /**
-         * @type {{
-         *     write: Function,
-         *     utils: {
-         *         book_new: Function,
-         *         aoa_to_sheet: Function,
-         *         book_append_sheet: Function
-         *     }
-         * }}
-         */
         var XLSX = goog.global['XLSX'];
+        var xlsxUtils = XLSX['utils'];
 
         // Convert csv to array or arrays.
         var csvParser = anychart.data.csv.parser();
         var data = csvParser.parse(csv);
 
         // Crete new xlsx book.
-        var book = XLSX.utils.book_new();
+        var book = xlsxUtils['book_new']();
         // Crete sheet and append data to it.
-        var sheetWithData = XLSX.utils.aoa_to_sheet(data);
+        var sheetWithData = xlsxUtils['aoa_to_sheet'](data);
 
         // Link sheet with book.
-        XLSX.utils.book_append_sheet(book, sheetWithData, 'data');
+        xlsxUtils['book_append_sheet'](book, sheetWithData, 'data');
 
         // Save book as BufferArray.
-        var arrayBuffer = XLSX.write(book, {type: 'array'});
+        var arrayBuffer = XLSX['write'](book, {type: 'array'});
         var blob = new Blob([arrayBuffer], {'type': anychart.exportsModule.offline.MIME_TYPES.XLSX});
 
         anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
