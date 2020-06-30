@@ -242,7 +242,7 @@ anychart.exportsModule.Exports.prototype.pinterest = function(opt_linkOrOptions,
 
 /**
  * Loads dependencies needed for offline export to work.
- * @param {anychart.core.VisualBase} target - Export target.
+ * @param {anychart.core.VisualBase|acgraph.vector.Stage} target - Export target.
  * @return {goog.Promise}
  */
 anychart.exportsModule.Exports.prototype.loadExternalDependencies = function(target) {
@@ -255,9 +255,12 @@ anychart.exportsModule.Exports.prototype.loadExternalDependencies = function(tar
   } else {
     var deps = this.externalDependencies_;
 
-    // Clientside settings should be resolved to take target settings into account.
+    /*
+      Clientside settings should be resolved to take target settings into account.
+      In case target is stage - just falls back to global clientside settings.
+     */
     var depsUrl = exports.getFinalSettings(target, 'clientside')['path'];
-    depsUrl += goog.string.endsWith(depsUrl, '/') ? '' : '/'; //append slash if not present, to assemble correct path
+    depsUrl += goog.string.endsWith(depsUrl, '/') ? '' : '/'; // Append slash if not present, to assemble correct path.
 
     var proms = [];
     for (var i = 0; i < deps.length; i++) {
