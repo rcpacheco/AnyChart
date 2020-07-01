@@ -255,10 +255,8 @@ anychart.exportsModule.Exports.prototype.pinterest = function(opt_linkOrOptions,
  */
 anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
   var exports = goog.global['anychart']['exports'];
-  if (exports && exports.isExternLoaded)
-    this.isExternLoaded = true;
 
-  if (this.isExternLoaded) {
+  if (exports.isExternLoaded) {
     return goog.Promise.resolve();
   } else {
     var deps = this.externalDependencies_;
@@ -287,7 +285,7 @@ anychart.exportsModule.Exports.prototype.loadExternalDependencies = function() {
     }
     return goog.Promise.all(proms)
       .then(function () {
-        anychart.exports.isExternLoaded = true;
+        exports.isExternLoaded = true;
       });
   }
 };

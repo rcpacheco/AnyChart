@@ -16,58 +16,53 @@ anychart.exportsModule.offline.MIME_TYPES = {
   XML: 'text/xml'
 };
 
+/**
+ * Returns mime type by passed extension name.
+ *
+ * @param {string} extension - Extension name.
+ * @return {anychart.exportsModule.offline.MIME_TYPES|string}
+ */
+anychart.exportsModule.offline.getMimeType = function (extension) {
+  switch (extension) {
+    case 'png:':
+      return anychart.exportsModule.offline.MIME_TYPES.PNG;
+    case 'jpg':
+      return anychart.exportsModule.offline.MIME_TYPES.JPG;
+    case 'svg':
+      return anychart.exportsModule.offline.MIME_TYPES.SVG;
+    case 'csv':
+      return anychart.exportsModule.offline.MIME_TYPES.CSV;
+    case 'pdf':
+      return anychart.exportsModule.offline.MIME_TYPES.PDF;
+    case 'json':
+      return anychart.exportsModule.offline.MIME_TYPES.JSON;
+    case 'xlsx':
+      return anychart.exportsModule.offline.MIME_TYPES.XLSX;
+    case 'xml':
+      return anychart.exportsModule.offline.MIME_TYPES.XML;
+  }
 
+  return '';
+};
 
 /**
- * Try to save csv file using blob and shared buffer.
+ * Try to save text data using blob and shared buffer.
  *
- * @param {string} csv - Csv chart data.
- * @param {string} fileName - File name to save.
- * @param {Function} failCallback - On fail callback. Old browsers don't supports blobs and array buffers.
+ * @param {string} data - Data to save.
+ * @param {string} fileName - Name of file.
+ * @param {string} fileExtension - Extension of file.
+ * @param {Function} failCallback - Function that calls something going wrong.
  */
-anychart.exportsModule.offline.saveAsCsv = function(csv, fileName, failCallback) {
+anychart.exportsModule.offline.exportNonBinaryData = function (data, fileName, fileExtension, failCallback) {
   try {
-    var blob = new Blob([csv], {'type': anychart.exportsModule.offline.MIME_TYPES.CSV});
+    var mime = anychart.exportsModule.offline.getMimeType(fileExtension);
+    var blob = new Blob([data], {'type': mime});
+
     anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
   } catch (e) {
     failCallback();
   }
 };
-
-
-/**
- * Try to save chart xml config file using blob and shared buffer.
- *
- * @param {string} xml - Xml chart config.
- * @param {string} fileName - File name to save.
- * @param {Function} failCallback - On fail callback. Old browsers don't supports blobs and array buffers.
- */
-anychart.exportsModule.offline.saveAsXml = function(xml, fileName, failCallback) {
-  try {
-    var blob = new Blob([xml], {'type': anychart.exportsModule.offline.MIME_TYPES.XML});
-    anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
-  } catch (e) {
-    failCallback();
-  }
-};
-
-
-/**
- * Try to save chart json config file using blob and shared buffer.
- *
- * @param {string} json - Json chart config.
- * @param {string} fileName - File name to save.
- * @param {Function} failCallback - On fail callback. Old browsers don't supports blobs and array buffers.
- */
-anychart.exportsModule.offline.saveAsJson = function(json, fileName, failCallback) {
-  try {
-    var blob = new Blob([json], {'type': anychart.exportsModule.offline.MIME_TYPES.JSON});
-    anychart.exportsModule.offline.downloadDataUrl(blob, fileName);
-  } catch (e) {
-    failCallback();
-  }
-};
-
 
 /**
  * Try to save xlsx file using blob and shared buffer.
@@ -442,7 +437,7 @@ anychart.exportsModule.offline.exportChartOffline = function(target, exportType,
  * Returns file extension depend on passed mime type.
  *
  * @param {anychart.exportsModule.offline.MIME_TYPES} type - File mime type.
- * @returns {string} - File extension
+ * @return {string} - File extension.
  */
 anychart.exportsModule.offline.getExtension = function (type) {
   switch (type) {

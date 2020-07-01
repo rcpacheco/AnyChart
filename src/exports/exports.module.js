@@ -65,6 +65,47 @@ anychart.exports.server = anychart.window['acgraph']['server'];
 
 
 /**
+ * Returns function that send request to export server.
+ *
+ * @param {string} data - Data to send.
+ * @param {string} fileName - Filename to save.
+ * @param {string} type - File type.
+ *
+ * @return {Function} - Function that send request.
+ */
+anychart.exports.createRequestFunction = function (data, fileName, type) {
+    return function () {
+        var options = {};
+        options['file-name'] = fileName;
+        options['data'] = data;
+        options['dataType'] = type;
+        options['responseType'] = 'file';
+
+        acgraph.sendRequestToExportServer(acgraph.exportServer + '/' + type, options);
+    };
+};
+
+/**
+ * Create and return wrapper function that write warnings in console over passed function.
+ *
+ * @param {Object} clientside - Object with data about client side export.
+ * @param {Function} fallbackFn - Fallback function.
+ *
+ * @return {Function}
+ */
+anychart.exports.createOnFailFallback = function(clientside, fallbackFn) {
+    return function (args) {
+        if (clientside['fallback']) {
+            anychart.core.reporting.info('Offline export failed, falling back to server.');
+            fallbackFn.call(arguments);
+        } else {
+            anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
+        }
+    };
+};
+
+
+/**
  * Saves the current visual state into PNG file.
  * @example <t>lineChart</t>
  * chart.line([4, 2, 12]);
@@ -101,14 +142,9 @@ anychart.exports.saveAsPng = function(target, container, opt_widthOrOptions, opt
 
     var clientside = anychart.exports.getFinalSettings(target, 'clientside');
 
-    var failCallback = function(args) {
-      if (clientside['fallback']) {
-        anychart.core.reporting.info('Offline export failed, falling back to server.');
-        stage.defaultSaveAsPng(args['width'], args['height'], args['quality'], args['filename']);
-      } else {
-        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
-      }
-    };
+    var failCallback = anychart.exports.createOnFailFallback(clientside, function (args) {
+      stage.defaultSaveAsPng(args['width'], args['height'], args['quality'], args['filename']);
+    });
 
     if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PNG, args, goog.nullFunction, failCallback);
@@ -160,14 +196,9 @@ anychart.exports.saveAsJpg = function(target, container, opt_widthOrOptions, opt
 
     var clientside = anychart.exports.getFinalSettings(target, 'clientside');
 
-    var failCallback = function(args) {
-      if (clientside['fallback']) {
-        anychart.core.reporting.info('Offline export failed, falling back to server.');
-        stage.defaultSaveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
-      } else {
-        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
-      }
-    };
+    var failCallback = anychart.exports.createOnFailFallback(clientside, function (args) {
+      stage.defaultSaveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
+    });
 
     if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.JPG, args, goog.nullFunction, failCallback);
@@ -221,14 +252,9 @@ anychart.exports.saveAsPdf = function(target, container, opt_paperSizeOrWidthOrO
 
     var clientside = anychart.exports.getFinalSettings(target, 'clientside');
 
-    var failCallback = function(args) {
-      if (clientside['fallback']) {
-        anychart.core.reporting.info('Offline export failed, falling back to server.');
-        stage.defaultSaveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
-      } else {
-        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
-      }
-    };
+    var failCallback = anychart.exports.createOnFailFallback(clientside, function (args) {
+      stage.defaultSaveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
+    });
 
     if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PDF, args, goog.nullFunction, failCallback);
@@ -278,14 +304,9 @@ anychart.exports.saveAsSvg = function(target, container, opt_paperSizeOrWidthOrO
 
     var clientside = anychart.exports.getFinalSettings(target, 'clientside');
 
-    var failCallback = function(args) {
-      if (clientside['fallback']) {
-        anychart.core.reporting.info('Offline export failed, falling back to server.');
-        stage.defaultSaveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
-      } else {
-        anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
-      }
-    };
+    var failCallback = anychart.exports.createOnFailFallback(clientside, function(args) {
+      stage.defaultSaveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+    });
 
     if (clientside['enabled']) {
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.SVG, args, goog.nullFunction, failCallback);
@@ -325,6 +346,27 @@ anychart.exports.toSvg = function(target, container, opt_paperSizeOrWidthOrOptio
   return '';
 };
 
+/**
+ * Save passed data as text file.
+ *
+ * @param {?anychart.core.VisualBase} target - Object that contains data about clientside export.
+ * @param {string} data - Text data to save.
+ * @param {string} type - File type.
+ * @param {string=} opt_filename - Name of file to save.
+ */
+anychart.exports.exportTextData = function (target, data, type, opt_filename) {
+    var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
+    var clientside = anychart.exports.getFinalSettings(target, 'clientside');
+
+    var exportRequestFn = anychart.exports.createRequestFunction(data, fileName, type);
+    var failCallback = anychart.exports.createOnFailFallback(clientside, exportRequestFn);
+
+    if (clientside['enabled']) {
+        anychart.exportsModule.offline.exportNonBinaryData(data, fileName, type, failCallback);
+    } else {
+        exportRequestFn();
+    }
+};
 
 /**
  * Saves chart config as XML document.
@@ -333,18 +375,8 @@ anychart.exports.toSvg = function(target, container, opt_paperSizeOrWidthOrOptio
  * @param {string} xml - Xml to save.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.saveAsXml = function(target, xml, opt_filename) {
-    var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
-
-    anychart.exportsModule.offline.saveAsXml(xml, fileName, function () {
-        var options = {};
-        options['file-name'] = fileName;
-        options['data'] = xml;
-        options['dataType'] = 'xml';
-        options['responseType'] = 'file';
-
-        acgraph.sendRequestToExportServer(acgraph.exportServer + '/xml', options);
-    });
+anychart.exports.saveAsXml = function (target, xml, opt_filename) {
+  anychart.exports.exportTextData(target, xml, 'xml', opt_filename);
 };
 
 
@@ -355,18 +387,8 @@ anychart.exports.saveAsXml = function(target, xml, opt_filename) {
  * @param {string} json - Json to save
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.saveAsJson = function(target, json, opt_filename) {
-    var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
-
-    anychart.exportsModule.offline.saveAsJson(json, fileName, function () {
-        var options = {};
-        options['file-name'] = fileName;
-        options['data'] = json;
-        options['dataType'] = 'json';
-        options['responseType'] = 'file';
-
-        acgraph.sendRequestToExportServer(acgraph.exportServer + '/json', options);
-    });
+anychart.exports.saveAsJson = function (target, json, opt_filename) {
+  anychart.exports.exportTextData(target, json, 'json', opt_filename);
 };
 
 
@@ -377,18 +399,8 @@ anychart.exports.saveAsJson = function(target, json, opt_filename) {
  * @param {string} csv - Csv chart data.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.saveAsCsv = function(target, csv, opt_filename) {
-    var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
-
-    anychart.exportsModule.offline.saveAsCsv(csv, fileName, function () {
-        var options = {};
-        options['file-name'] = fileName;
-        options['data'] = csv;
-        options['dataType'] = 'csv';
-        options['responseType'] = 'file';
-
-        acgraph.sendRequestToExportServer(acgraph.exportServer + '/csv', options);
-    });
+anychart.exports.saveAsCsv = function (target, csv, opt_filename) {
+  anychart.exports.exportTextData(target, csv, 'csv', opt_filename);
 };
 
 
@@ -399,38 +411,8 @@ anychart.exports.saveAsCsv = function(target, csv, opt_filename) {
  * @param {string} csv - Csv chart data.
  * @param {string=} opt_filename file name to save.
  */
-anychart.exports.saveAsXlsx = function(target, csv, opt_filename) {
-    var fileName = /**@type {string}*/(opt_filename || anychart.exports.getFinalSettings(target, 'filename'));
-
-    /**
-     * Function that send request to anychart export server.
-     */
-    var performExportRequest = function() {
-        var options = {};
-        options['file-name'] = fileName;
-        options['data'] = csv;
-        options['dataType'] = 'xlsx';
-        options['responseType'] = 'file';
-
-        acgraph.sendRequestToExportServer(acgraph.exportServer + '/xlsx', options);
-    };
-
-    var clientside = anychart.exports.getFinalSettings(target, 'clientside');
-
-    var failCallback = function() {
-        if (clientside['fallback']) {
-            anychart.core.reporting.info('Offline export failed, falling back to server.');
-            performExportRequest();
-        } else {
-            anychart.core.reporting.info('Offline export failed, fallback to server disabled.');
-        }
-    };
-
-    if (clientside['enabled']) {
-        anychart.exportsModule.offline.saveAsXlsx(csv, fileName, failCallback);
-    } else {
-        performExportRequest();
-    }
+anychart.exports.saveAsXlsx = function (target, csv, opt_filename) {
+  anychart.exports.exportTextData(target, csv, 'xlsx', opt_filename);
 };
 
 
