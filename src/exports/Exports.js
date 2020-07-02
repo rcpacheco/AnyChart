@@ -102,10 +102,11 @@ anychart.exportsModule.Exports.prototype.isClientsideEnabled = function() {
 
 
 /**
- * @typedef {Object}
- * @property {boolean} [fallback] - Whether to use export server fallback.
- * @property {string} [path] - Path to thirdparty dependencies.
- * @property {boolean} [enabled] - If client side export enabled.
+ * @typedef {{
+ *   fallback: (boolean|undefined),
+ *   path: (string|undefined),
+ *   enabled: (boolean|undefined)
+ * }}
  */
 anychart.exportsModule.Exports.ClientsideConfig;
 
