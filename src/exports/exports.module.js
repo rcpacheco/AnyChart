@@ -114,6 +114,8 @@ anychart.exports.saveAsPng = function(target, container, opt_widthOrOptions, opt
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PNG, args, goog.nullFunction, failCallback);
     } else if (clientside['fallback']) { // Only use export server if fallback enabled in clientside settings.
       stage.defaultSaveAsPng(args['width'], args['height'], args['quality'], args['filename']);
+    } else {
+      anychart.core.reporting.callLog('warn', 'Both client side export and export server fallback are disabled. Nothing will be exported.');
     }
   }
 };
@@ -173,6 +175,8 @@ anychart.exports.saveAsJpg = function(target, container, opt_widthOrOptions, opt
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.JPG, args, goog.nullFunction, failCallback);
     } else if (clientside['fallback']) { // Only use export server if fallback enabled in clientside settings.
       stage.defaultSaveAsJpg(args['width'], args['height'], args['quality'], args['forceTransparentWhite'], args['filename']);
+    } else {
+      anychart.core.reporting.callLog('warn', 'Both client side export and export server fallback are disabled. Nothing will be exported.');
     }
   }
 };
@@ -234,6 +238,8 @@ anychart.exports.saveAsPdf = function(target, container, opt_paperSizeOrWidthOrO
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.PDF, args, goog.nullFunction, failCallback);
     } else if (clientside['fallback']) { // Only use export server if fallback enabled in clientside settings.
       stage.defaultSaveAsPdf(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['x'], args['y'], args['filename']);
+    } else {
+      anychart.core.reporting.callLog('warn', 'Both client side export and export server fallback are disabled. Nothing will be exported.');
     }
   }
 };
@@ -291,6 +297,8 @@ anychart.exports.saveAsSvg = function(target, container, opt_paperSizeOrWidthOrO
       anychart.exportsModule.offline.exportChartOffline(target, acgraph.vector.Stage.ExportType.SVG, args, goog.nullFunction, failCallback);
     } else if (clientside['fallback']) { // Only use export server if fallback enabled in clientside settings.
       stage.defaultSaveAsSvg(args['paperSize'] || args['width'], args['landscape'] || args['height'], args['filename']);
+    } else {
+      anychart.core.reporting.callLog('warn', 'Both client side export and export server fallback are disabled. Nothing will be exported.');
     }
   }
 };
