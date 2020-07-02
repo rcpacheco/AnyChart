@@ -320,6 +320,7 @@ anychart.ganttModule.TimeLine = function(opt_controller, opt_isResources) {
    */
   this.scale_ = new anychart.scales.GanttDateTime();
   this.scale_.listenSignals(this.scaleInvalidated_, this);
+  this.scale_.boundsProvider(this);
 
   /**
    *

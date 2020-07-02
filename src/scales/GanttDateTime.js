@@ -118,17 +118,25 @@ anychart.scales.GanttDateTime = function() {
 
   /**
    * Minimum gap.
-   * @type {number}
+   *
+   * @type {anychart.scales.GanttDateTime.Gap}
    * @private
    */
-  this.minimumGap_ = .01;
+  this.minimumGap_ = {
+    'value': .01,
+    'isPixels': false
+  };
 
   /**
    * Maximum gap.
-   * @type {number}
+   *
+   * @type {anychart.scales.GanttDateTime.Gap}
    * @private
    */
-  this.maximumGap_ = .01;
+  this.maximumGap_ = {
+    'value': .01,
+    'isPixels': false
+  };
 
   /**
    * Current date. Used for this.timestampToRatio('current') to make this method return the same on different calls.
@@ -192,6 +200,15 @@ anychart.scales.GanttDateTime = function() {
    * @private
    */
   this.calendar_ = null;
+
+  /**
+   * Entity that provides an ability to ask provider.getPixelBounds().width
+   * for pixel-gapping purposes.
+   *
+   * @type {?anychart.core.VisualBaseWithBounds}
+   * @private
+   */
+  this.boundsProvider_ = null;
 };
 goog.inherits(anychart.scales.GanttDateTime, anychart.core.Base);
 
@@ -232,12 +249,21 @@ anychart.scales.GanttDateTime.LevelData;
 
 /**
  * @typedef {{
- *  start:number,
- *  end:number,
- *  holiday:(boolean|undefined)
+ *  start: number,
+ *  end: number,
+ *  holiday: (boolean|undefined)
  * }}
  */
 anychart.scales.GanttDateTime.Tick;
+
+
+/**
+ * @typedef {{
+ *  value: number,
+ *  isPixels: boolean
+ * }}
+ */
+anychart.scales.GanttDateTime.Gap;
 
 
 //endregion
@@ -303,6 +329,46 @@ anychart.scales.GanttDateTime.DEFAULT_LEVELS = [
  */
 anychart.scales.GanttDateTime.prototype.getType = function() {
   return anychart.enums.ScaleTypes.GANTT;
+};
+
+/**
+ * Gets/sets this.boundsProvider_. @see this.boundsProvider_ description.
+ * Must be set anyway and set before any scale calculations.
+ *
+ * @param {?anychart.core.VisualBaseWithBounds=} opt_value - Provider to be set.
+ * @return {?anychart.core.VisualBaseWithBounds|anychart.scales.GanttDateTime} - Current provider
+ *  or itself for chaining.
+ */
+anychart.scales.GanttDateTime.prototype.boundsProvider = function(opt_value) {
+  if (goog.isDef(opt_value)) {
+    if (this.boundsProvider_ !== opt_value) {
+      if (goog.isNull(opt_value)) { // this.boundsProvider_ is not null here.
+        this.boundsProvider_.unlistenSignals(this.boundsProviderInvalidated_, this);
+        this.boundsProvider_ = null;
+      } else {
+        if (this.boundsProvider_) {
+          this.boundsProvider_.unlistenSignals(this.boundsProviderInvalidated_, this);
+        }
+        this.boundsProvider_ = opt_value;
+        this.boundsProvider_.listenSignals(this.boundsProviderInvalidated_, this);
+      }
+    }
+    return this;
+  }
+  return this.boundsProvider_;
+};
+
+
+/**
+ * Handler of bounds changed.
+ *
+ * @param {anychart.SignalEvent} e - .
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.boundsProviderInvalidated_ = function(e) {
+  if (e.hasSignal(anychart.Signal.BOUNDS_CHANGED) && this.resetLimitsByGaps_()) {
+    this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+  }
 };
 
 
@@ -395,6 +461,7 @@ anychart.scales.GanttDateTime.prototype.setDataRange = function(min, max) {
  */
 anychart.scales.GanttDateTime.prototype.fitAll = function() {
   if (!this.isEmpty()) {
+    this.resetLimitsByGaps_();
     var range = this.getTotalRange();
     return this.setRange(range['min'], range['max']);
   } else {
@@ -417,6 +484,8 @@ anychart.scales.GanttDateTime.prototype.fitAll = function() {
 anychart.scales.GanttDateTime.prototype.zoomIn = function(opt_zoomFactor, opt_ratio) {
   var factor = 1 / (opt_zoomFactor || anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR);
   var ratio = goog.isDef(opt_ratio) ? opt_ratio : 0.5;
+
+  this.resetLimitsByGaps_();
 
   if (!this.isEmpty()) {
     var range = this.max_ - this.min_;
@@ -451,6 +520,8 @@ anychart.scales.GanttDateTime.prototype.zoomIn = function(opt_zoomFactor, opt_ra
 anychart.scales.GanttDateTime.prototype.zoomOut = function(opt_zoomFactor, opt_ratio) {
   var factor = opt_zoomFactor || anychart.scales.GanttDateTime.DEFAULT_ZOOM_FACTOR;
   var ratio = goog.isDef(opt_ratio) ? opt_ratio : 0.5;
+
+  this.resetLimitsByGaps_();
 
   if (!this.minReached_() || !this.maxReached_()) {
     /*
@@ -505,6 +576,9 @@ anychart.scales.GanttDateTime.prototype.zoomOut = function(opt_zoomFactor, opt_r
 anychart.scales.GanttDateTime.prototype.zoomTo = function(startOrUnit, opt_endOrCount, opt_anchor) {
   var range;
   var start, end;
+
+  this.resetLimitsByGaps_();
+
   this.calculate();
   if (goog.isString(startOrUnit)) {
     if (opt_endOrCount === 0) {
@@ -766,18 +840,66 @@ anychart.scales.GanttDateTime.prototype.getRange = function() {
 };
 
 
+anychart.scales.GanttDateTime.prototype.getBoundingMin_ = function() {
+  if (isNaN(this.manualMin_)) {
+    if (isNaN(this.softMin_)) {
+      /*
+        TODO (A.Kudryavtsev): Do we need it?
+       */
+    }
+    return Math.min(this.softMin_, this.dataMin_);
+  }
+  return this.manualMin_;
+};
+
+
+/**
+ *
+ * @param {number} range - Range to calculate from.
+ * @param {anychart.scales.GanttDateTime.Gap} gap - Gap to calculate from.
+ * @return {number} - Milliseconds gap from range and gap settings.
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.getMsGap_ = function(range, gap) {
+  var value = gap['value'];
+
+  if (gap['isPixels']) {
+    var visibleRange = this.max_ - this.min_;
+    console.log('Visible range: ', visibleRange);
+
+    // this.boundsProvider_ must be already defined here.
+    var width = this.boundsProvider_.getPixelBounds().width;
+
+    // pixel gap can't be more than (width/2 + 1) px.
+    var limitedGap = Math.min(Math.floor(width/2) + 1, value); // TODO (A.Kudryavtsev): Check!
+
+    return Math.round(limitedGap * visibleRange / width);
+
+  }
+
+  return range * value;
+};
+
+
 /**
  * Gets total minimum and maximum dates set for scale.
+ *
  * @return {{min: number, max: number}}
  */
 anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
+  /*
+    TODO (A.Kudryavtsev): MOVE PX GAPS HERE!
+   */
   var range, gap;
   if (isNaN(this.totalMin_)) {
     if (isNaN(this.manualMin_)) {
       if (isNaN(this.softMin_)) {
+        /*
+          TODO (A.Kudryavtsev): Redo this shit!
+         */
         var max = (isNaN(this.manualMax_) ? (isNaN(this.softMax_) ? this.dataMax_ : Math.max(this.dataMax_, this.softMax_)) : this.manualMax_);
         range = max - this.dataMin_;
-        gap = range * this.minimumGap_;
+        gap = this.getMsGap_(range, this.minimumGap_);
         this.totalMin_ = this.dataMin_ - gap;
       } else {
         this.totalMin_ = Math.min(this.softMin_, this.dataMin_);
@@ -790,9 +912,12 @@ anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
   if (isNaN(this.totalMax_)) {
     if (isNaN(this.manualMax_)) {
       if (isNaN(this.softMax_)) {
+        /*
+          TODO (A.Kudryavtsev): Redo this shit!
+         */
         var min = (isNaN(this.manualMin_) ? (isNaN(this.softMin_) ? this.dataMin_ : Math.min(this.dataMin_, this.softMin_)) : this.manualMin_);
         range = this.dataMax_ - min;
-        gap = range * this.maximumGap_;
+        gap = this.getMsGap_(range, this.maximumGap_);
         this.totalMax_ = this.dataMax_ + gap;
       } else {
         this.totalMax_ = Math.max(this.softMax_, this.dataMax_);
@@ -802,7 +927,9 @@ anychart.scales.GanttDateTime.prototype.getTotalRange = function() {
     }
   }
 
-  return this.isEmpty() ? this.getEmptyRange() : {'min': this.totalMin_, 'max': this.totalMax_};
+  return this.isEmpty() ?
+      this.getEmptyRange() :
+      {'min': this.totalMin_, 'max': this.totalMax_};
 };
 
 
@@ -879,46 +1006,6 @@ anychart.scales.GanttDateTime.prototype.softMaximum = function(opt_value) {
     }
   }
   return this.softMax_;
-};
-
-
-/**
- * Gets/sets minimum gap.
- * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.minimumGap = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = +opt_value || 0;
-    if (this.minimumGap_ != opt_value) {
-      this.minimumGap_ = opt_value;
-      this.totalMin_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-    return this;
-  }
-  return this.minimumGap_;
-};
-
-
-/**
- * Gets/sets maximum gap.
- * @param {number=} opt_value - Value to be set.
- * @return {number|anychart.scales.GanttDateTime} - Current value or itself for method chaining.
- */
-anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value) {
-  if (goog.isDef(opt_value)) {
-    opt_value = +opt_value || 0;
-    if (this.maximumGap_ != opt_value) {
-      this.maximumGap_ = opt_value;
-      this.totalMax_ = NaN;
-      this.consistent = false;
-      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
-    }
-    return this;
-  }
-  return this.maximumGap_;
 };
 
 
@@ -1068,6 +1155,139 @@ anychart.scales.GanttDateTime.prototype.calendar = function(opt_value) {
     this.dispatchSignal(anychart.Signal.NEEDS_REAPPLICATION);
   }
   return this.calendar_;
+};
+
+
+//endregion
+//region -- Gaps.
+/**
+ * Normalizes gap to definitely typed value.
+ *
+ * @param {(number|anychart.scales.GanttDateTime.Gap)=} opt_value - Numeric value of gap or
+ *  prepared normalized value.
+ * @param {boolean=} opt_treatAsPixels - Whether to treat opt_value as pixels, not as percents.
+ * @private
+ * @return {anychart.scales.GanttDateTime.Gap} - Normalized gap object
+ */
+anychart.scales.GanttDateTime.prototype.normalizeGap_ = function(opt_value, opt_treatAsPixels) {
+  /**
+   * @type {anychart.scales.GanttDateTime.Gap}
+   */
+  var normalized = {
+    'value': 0,
+    'isPixels': Boolean(opt_treatAsPixels)
+  };
+
+  if (goog.isDef(opt_value)) {
+    if (goog.typeOf(opt_value) === 'object') {
+      normalized['value'] = +opt_value['value'] || 0;
+      normalized['isPixels'] = Boolean(opt_value['isPixels']);
+    } else {
+      normalized['value'] = +opt_value || 0;
+    }
+  }
+
+  return normalized;
+};
+
+
+/**
+ * Compares normalized gaps.
+ *
+ * @param {anychart.scales.GanttDateTime.Gap} oldGap - Old gap normalized value.
+ * @param {anychart.scales.GanttDateTime.Gap} newGap - New gap normalized value.
+ * @return {boolean} - TRUE if gaps have totally the same values, FALSE otherwise.
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.compareGaps_ = function(oldGap, newGap) {
+  // TODO (A.Kudryavtsev): I could use goog.object.equals here, but it would be slower.
+  return (oldGap['value'] === newGap['value'] && oldGap['isPixels'] === newGap['isPixels']);
+};
+
+
+/**
+ * Gets/sets minimum gap.
+ *
+ * @param {(number|anychart.scales.GanttDateTime.Gap)=} opt_value - Numeric value of gap or
+ *  prepared normalized value.
+ * @param {boolean=} opt_treatAsPixels - Whether to treat opt_value as pixels, not as percents.
+ * @return {number|anychart.scales.GanttDateTime|anychart.scales.GanttDateTime.Gap} - Current
+ *  value or itself for method chaining.
+ *  NOTE: for legacy purposes, if gap is percent, number will be returned.
+ */
+anychart.scales.GanttDateTime.prototype.minimumGap = function(opt_value, opt_treatAsPixels) {
+  if (goog.isDef(opt_value)) {
+    var newGap = this.normalizeGap_(opt_value, opt_treatAsPixels);
+    if (!this.compareGaps_(this.minimumGap_, newGap)) {
+      this.minimumGap_ = newGap;
+      this.totalMin_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+
+  // TODO (A.Kudryavtsev): This mess is for legacy. Actually is @deprecated since 8.8.0.
+  return this.minimumGap_['isPixels'] ?
+      this.minimumGap_ :
+      this.minimumGap_['value'];
+};
+
+
+/**
+ * Gets/sets maximum gap.
+ *
+ * @param {(number|anychart.scales.GanttDateTime.Gap)=} opt_value - Numeric value of gap or
+ *  prepared normalized value.
+ * @param {boolean=} opt_treatAsPixels - Whether to treat opt_value as pixels, not as percents.
+ * @return {number|anychart.scales.GanttDateTime|anychart.scales.GanttDateTime.Gap} - Current
+ *  value or itself for method chaining.
+ *  NOTE: for legacy purposes, if gap is percent, number will be returned.
+ */
+anychart.scales.GanttDateTime.prototype.maximumGap = function(opt_value, opt_treatAsPixels) {
+  if (goog.isDef(opt_value)) {
+    var newGap = this.normalizeGap_(opt_value, opt_treatAsPixels);
+    if (!this.compareGaps_(this.maximumGap_, newGap)) {
+      this.maximumGap_ = newGap;
+      this.totalMax_ = NaN;
+      this.consistent = false;
+      this.dispatchSignal(anychart.Signal.NEEDS_RECALCULATION);
+    }
+    return this;
+  }
+
+  // TODO (A.Kudryavtsev): This mess is for legacy. Actually is @deprecated since 8.8.0.
+  return this.maximumGap_['isPixels'] ?
+      this.maximumGap_ :
+      this.maximumGap_['value'];
+};
+
+
+/**
+ * See return description.
+ *
+ * @return {boolean} - Whether scale has pixel-gap set.
+ * @private
+ */
+anychart.scales.GanttDateTime.prototype.hasPixelGaps_ = function() {
+  return Boolean(this.minimumGap_['isPixels'] || this.maximumGap_['isPixels']);
+};
+
+/**
+ * Actually resets total min and max and marks scale as inconsistent
+ * to be recalculated.
+ *
+ * @private
+ * @return {boolean} - Whether scale has been reset.
+ */
+anychart.scales.GanttDateTime.prototype.resetLimitsByGaps_ = function() {
+  if (this.hasPixelGaps_() && !this.isEmpty()) {
+    this.totalMin_ = NaN;
+    this.totalMax_ = NaN;
+    this.consistent = false;
+    return true;
+  }
+  return false;
 };
 
 
@@ -1335,6 +1555,7 @@ anychart.scales.GanttDateTime.prototype.getWorkingSchedule = function() {
  */
 anychart.scales.GanttDateTime.prototype.ratioScroll = function(ratio) {
   if (ratio && !this.isEmpty()) {
+    this.resetLimitsByGaps_();
     var totalRange = this.getTotalRange();
     var msInterval = Math.round((this.max_ - this.min_) * ratio);
     var interval = 0;
@@ -1357,6 +1578,7 @@ anychart.scales.GanttDateTime.prototype.ratioScroll = function(ratio) {
  */
 anychart.scales.GanttDateTime.prototype.ratioForceScroll = function(ratio) {
   if (ratio && !this.isEmpty()) {
+    this.resetLimitsByGaps_();
     this.getTotalRange();
 
     var msInterval = Math.round((this.max_ - this.min_) * ratio);
